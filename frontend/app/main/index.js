@@ -15,15 +15,15 @@
       })
       
       // .when('/games', {
-      //   controller:   'LoginController',
-      //   controllerAs: 'loginCtrl',
-      //   templateUrl:  './components/login/login-view.html'
+      //   controller:   'GamesController',
+      //   controllerAs: 'gamesCtrl',
+      //   templateUrl:  './components/games/games-view.html'
       // })
       
       // .when('/games/:gameId', {
-      //   controller:   'LoginController',
-      //   controllerAs: 'loginCtrl',
-      //   templateUrl:  './components/login/login-view.html'
+      //   controller:   'GameController',
+      //   controllerAs: 'gameCtrl',
+      //   templateUrl:  './components/game/game-view.html'
       // })
       
       .when('/new-game', {
@@ -33,9 +33,9 @@
       })
       
       // .when('/tutorial', {
-      //   controller:   'LoginController',
-      //   controllerAs: 'loginCtrl',
-      //   templateUrl:  './components/login/login-view.html'
+      //   controller:   'TutorialController',
+      //   controllerAs: 'tutCtrl',
+      //   templateUrl:  './components/tutorial/tutorial-view.html'
       // })
       
       
