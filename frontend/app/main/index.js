@@ -1,7 +1,7 @@
 //'sy-login'
 
 (function(){
-  angular.module('syScotlandYard', ['ngRoute', 'syServices', 'syLogin', 'syNavModule'])
+  angular.module('syScotlandYard', ['ngRoute', 'syServices', 'syLogin', 'syNav', 'syGame'])
     .config(['$routeProvider', '$locationProvider', mainRouter]);
     
   function mainRouter($routeProvider, $locationProvider) {

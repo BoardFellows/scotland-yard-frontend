@@ -1,5 +1,5 @@
 (function() {
-  angular.module('syNavModule')
+  angular.module('syNav')
     .directive('syNavbar', syNavbar);
     
   function syNavbar() {

@@ -6,6 +6,7 @@ require('angular-route');
 
 require(__dirname + '/app/services/services.js');
 require(__dirname + '/app/services/request-proxy.js');
+require(__dirname + '/app/services/game-state.js');
 
 require(__dirname + '/app/components/nav/controller.js');
 require(__dirname + '/app/components/nav/directive.js');
