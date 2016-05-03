@@ -2,15 +2,15 @@
 
 (function() {
   angular.module('syGame')
-    .controller('BoardController', ['$log', 'gameState', BoardController]);
+    .controller('BoardController', ['$log', '$document', 'gameState', BoardController]);
     
-  function BoardController($log, gameState) {
+  function BoardController($log, $document, gameState) {
     const vm                = this;
     const mapStyle          = require(__dirname + '/map-options.js');
     
     // MAP RELATED
     vm.map                  = null;
-    vm.mapHolder            = document.getElementById('#map_canvas');
+    vm.mapHolder            = $document.find('#map_canvas')[0];
     
     // OBJECTS DRAWN ONTO MAP
     vm.playerMarkers        = [];

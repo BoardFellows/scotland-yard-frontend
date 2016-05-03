@@ -1,19 +1,31 @@
 (function() {
   angular.module('syGame', [])
-    .controller('GameController', ['$log', '$routeParams', 'makeApiRequest',  GameController]);
+    .controller('GameController', ['$log', '$window', '$location', '$route', '$routeParams', 'makeApiRequest', 'gameState',  GameController]);
   
-  function GameController($log, $routeParams, makeApiRequest) {
-    const vm = this;
-    vm.gameId = $routeParams.gameId;
+  
+  function GameController($log, $window, $location, $route, $routeParams, makeApiRequest, gameState) {
+    const vm        = this;
+    vm.gameId       = $routeParams.gameId;
     
-    vm.initialize = initialize;
+    vm.initialize   = initialize;
+    
     
     
     
     // THIS WILL BRING IN THE INFORMATION ABOUT THE GAME
     function initialize() {
+      $log.info('GameController initialize');
+      if (!$window.localStorage.getItem('authToken')) {
+        $location.url('/login');
+        $route.reload();
+      }
+      
+      
+      
+      
       
     }
+    
   }
   
 })();

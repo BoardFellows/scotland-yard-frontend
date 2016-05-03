@@ -1,9 +1,9 @@
 (function() {
   angular.module('syServices')
-    .factory('makeApiRequest', ['$log', '$http', makeApiRequest]);
+    .factory('makeApiRequest', ['$log', '$http', '$window', makeApiRequest]);
   
   
-  function makeApiRequest($log, $http) {
+  function makeApiRequest($log, $http, $window) {
     return function makeApiRequest(method, path, cb, data, headers) {
       $log.info(`proxyService request ${method} ${path}`);
       
@@ -20,9 +20,9 @@
         requestParams.headers = headers;
       }
       // AUTOMATICALLY ADDS authToken if it's available
-      if (sessionStorage.getItem('authToken')){
+      if ($window.sessionStorage.getItem('authToken')){
         requestParams.headers = {
-          token: sessionStorage.getItem('authToken')
+          token: $window.sessionStorage.getItem('authToken')
         };
       }
       $log.log('requestParams are ', requestParams);

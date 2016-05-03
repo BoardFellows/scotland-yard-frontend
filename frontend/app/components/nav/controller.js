@@ -9,7 +9,7 @@
     vm.setActive    = setActive;
     
     // TODO: make it so that which of these is selected updates with changes in the route
-    $scope.watch(function() {
+    $scope.$watch(function() {
       return $location.url();
     }, function() {
       vm.tab = $location.url();

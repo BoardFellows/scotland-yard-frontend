@@ -1,10 +1,10 @@
 (function() {
   angular.module('syServices')
-    .factory('gameState', ['$log', '$timeout', '$routeParams','makeApiRequest', gameState]);
+    .factory('gameState', ['$log', '$window', '$timeout', '$routeParams','makeApiRequest', gameState]);
   
-  function gameState($log, $timeout, $routeParams, makeApiRequest) {
+  function gameState($log, $window, $timeout, $routeParams, makeApiRequest) {
     const gameState               = {};
-    gameState.board               = localStorage.getItem('board') || null;
+    gameState.board               = $window.localStorage.getItem('board') || null;
     gameState.game                = {};
     gameState.turns               = [];
     gameState.lastUpdated         = null;
@@ -44,7 +44,7 @@
         otherPlayerEmail
       };
       
-      makeApiRequest('POST', 'games', (err, response) => {
+      makeApiRequest('POST', 'games/', (err, response) => {
         if (err) {
           $log.error(err);
           

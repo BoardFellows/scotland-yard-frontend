@@ -1,8 +1,8 @@
 (function() {
   angular.module('syLogin', ['syServices'])
-    .controller('LoginController', ['$log', '$location', '$route', 'makeApiRequest', LoginController]);
+    .controller('LoginController', ['$log', '$window', '$location', '$route', 'makeApiRequest', LoginController]);
     
-  function LoginController($log, $location, $route, makeApiRequest) {
+  function LoginController($log, $window, $location, $route, makeApiRequest) {
     const vm                      = this;
     vm.test                       = null;
     vm.errorMessage               = null;
@@ -55,7 +55,7 @@
     /////////////////////////////////////
     // REROUTE THEM IF THEY'RE ALREADY LOGGED IN
     function initialize() {
-      if (sessionStorage.getItem('authToken')) {
+      if ($window.sessionStorage.getItem('authToken')) {
         $location.url('/games');
         $route.reload();
       }  
@@ -80,7 +80,7 @@
           if (err) {
             throw new Error('There was a problem creating your account.');
           } else {
-            sessionStorage.setItem('authToken', response.data.token);
+            $window.sessionStorage.setItem('authToken', response.data.token);
             $location.url('/games');
             $route.reload();
           }
@@ -115,7 +115,7 @@
           if (err) {
             throw new Error('There was a problem creating your account.');
           } else {
-            sessionStorage.setItem('authToken', response.data.token);
+            $window.sessionStorage.setItem('authToken', response.data.token);
             $location.url('/games');
             $route.reload();
           }
