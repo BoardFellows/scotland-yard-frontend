@@ -1,6 +1,6 @@
 (function() {
   angular.module('syGame')
-    .directive('gameBoard', [gameBoard]);
+    .directive('gameBoard', gameBoard);
   
   function gameBoard() {
     return {
@@ -10,4 +10,5 @@
       controllerAs: 'boardCtrl'
     };
   }
+  
 })();

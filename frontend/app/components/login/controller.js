@@ -72,7 +72,7 @@
           throw new Error('Please fill out your username and password.');
         }
         let authHeaders = {
-          authorization: 'Basic ' + btoa(vm.user.username + ':' + vm.user.password)
+          authorization: 'Basic ' + $window.btoa(vm.user.username + ':' + vm.user.password)
         };
         
         // MAKE THE REQUEST

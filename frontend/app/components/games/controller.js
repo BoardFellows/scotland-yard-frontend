@@ -1,12 +1,12 @@
 (function() {
-  angular.module('syGames', ['syServices'])
-    .controller('GamesController', ['$log', '$window', '$location', '$route', '$routeParams', 'gameState',  GamesController])
+  angular.module('syGames', ['syNav', 'syServices'])
+    .controller('GamesController', ['$log', '$window', '$location', '$route', 'rerouteIfNeeded', 'gameState', GamesController])
     .controller('GameSummaryController', ['$log', '$scope', GameSummaryController]);
   
   
   
   // CONTROLLER FOR THE NEW GAME / CURRENT GAMES SCREEN
-  function GamesController($log, $window, $location, $route, $routeParams, gameState) {
+  function GamesController($log, $window, $location, $route, rerouteIfNeeded, gameState) {
     const vm                    = this;
     vm.createGameFormHidden     = true;
     vm.createGameButText        = 'New Game';
@@ -26,10 +26,8 @@
     // REROUTE TO LOGIN IF NEEDED, OTHERWISE SET GAMES 
     function initialize() {
       $log.info('GamesController initialize');
-      if (!$window.sessionStorage.getItem('authToken')) {
-        $location.url('/login');
-        $route.reload();
-      }
+      rerouteIfNeeded();
+      
       
       // vm.games = 
       
@@ -62,4 +60,5 @@
     
     
   }
+  
 })();

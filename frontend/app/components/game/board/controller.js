@@ -78,62 +78,74 @@
     /////////////////////////////////////
     // DRAWS THE NODES ONTO THE MAP TO START WITH
     function drawNodesOntoMap() {
+      $log.info('BoardController drawNodesOntoMap');
       
     }
     
     /////////////////////////////////////
     // DRAWS PATHS ONTO THE MAP TO START WITH
     function drawEdgesOntoMap() {
+      $log.info('BoardController drawEdgesOntoMap');
       
     }
     
     /////////////////////////////////////
     // DRAWS INITIAL PLAYER POSITIONS ONTO MAP TO START WITH
     function drawInitialPlayers() {
+      $log.info('BoardController drawInitialPlayers');
       
     }
     
     /////////////////////////////////////
     // ATTACHES THE LISTENERS TO THE MAP
     function attachListeners() {
+      $log.info('BoardController attachListeners');
       
     }
     
     /////////////////////////////////////
     // HIGHLIGHTS THE PATHS AVAILABLE FROM A GIVEN NODE
     function showMovesFromNode() {
+      $log.info('BoardController showMovesFromNode');
       
     }
     
     /////////////////////////////////////
     // HANDLES A USER'S INITIAL ATTEMPT TO MOVE TO A NODE
     function attemptToMoveToNode(nodeId) {
+      $log.info('BoardController attemptToMoveToNode');
       
     }
     
     /////////////////////////////////////
     // IF THERE ARE MULTIPLE WAYS TO GET TO A DESIRED NODE, ASKS FOR TYPE OF PAYMENT
     function askForTokenType() {
+      $log.info('BoardController askForTokenType');
       
     }
     
     /////////////////////////////////////
     // RUNS ONCE A PLAYER HAS SELECTED THEIR PAYMENT TYPE
     function processPayment() {
+      $log.info('BoardController processPayment');
       
     }
     
     /////////////////////////////////////
     // DRAWS THE PLAYER AT THE SPECIFIED NODE
     function drawPlayerAtNode(playerId, nodeId) {
+      $log.info('BoardController drawPlayerAtNode');
       
     }
     
     /////////////////////////////////////
     // PREVENTS THE PLAYER FROM GOING TO ANOTHER AREA OF THE MAP
     function limitViewableArea() {
+      $log.info('BoardController limitViewableArea');
       
     }
+    
+    
     
   }  
   

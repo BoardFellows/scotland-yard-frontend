@@ -1,14 +1,15 @@
 (function() {
   angular.module('syServices')
-    .factory('gameState', ['$log', '$window', '$timeout', '$routeParams','makeApiRequest', gameState]);
+    .factory('gameState', ['$log', '$window', '$timeout', '$routeParams','makeApiRequest', 'rerouteIfNeeded', gameState]);
   
-  function gameState($log, $window, $timeout, $routeParams, makeApiRequest) {
+  function gameState($log, $window, $timeout, $routeParams, makeApiRequest, rerouteIfNeeded) {
     const gameState               = {};
     gameState.board               = $window.localStorage.getItem('board') || null;
+    gameState.gameId              = null;
     gameState.game                = {};
     gameState.turns               = [];
     gameState.lastUpdated         = null;
-    gameState.turnsUntilMrXRevel  = 3;
+    gameState.turnsUntilMrXReveal = null;
     
     gameState.userType            = null;
     gameState.usersTurn           = false;
@@ -20,11 +21,14 @@
     gameState.buildInitGameState  = buildInitGameState;
     gameState.loadBoard           = loadBoard;
     gameState.loadGame            = loadGame;
+    gameState.handleThisTurn      = handleThisTurn;
+    gameState.buildBoardThisTurn  = buildBoardThisTurn;
     gameState.checkMove           = checkMove;
     gameState.makeMove            = makeMove;
     gameState.getMovesFromNode    = getMovesFromNode;
     gameState.getNextPlayerToMove = getNextPlayerToMove;
     gameState.pollDbForUpdate     = pollDbForUpdate;
+    
     
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
@@ -69,23 +73,49 @@
     // GET ALL DATA NEEDED FOR GAME START
     function initialize(cb) {
       $log.info('gameState initialize');
+      gameState.gameId = $routeParams.gameId;
+      
       // CHECK IF NEED TO LOAD BOARD
       if (!gameState.board) {
-        gameState.loadBoard();
+        gameState.loadBoard(() => {
+          // CHECK IF NEED TO LOAD GAME
+          if (!gameState.game) {
+            gameState.loadGame(gameState.gameId);
+          }
+        });
+        
+      } else {
+        // CHECK IF NEED TO LOAD GAME
+        if (!gameState.game) {
+          gameState.loadGame(gameState.gameId);
+        }
       }
-      
-      // CHECK IF NEED TO LOAD GAME
-      if (!gameState.game) {
-        gameState.loadGame($routeParams.gameId);
-      }
-      
     }
     
     
     /////////////////////////////////////
     // GET BOARD DATA
-    function loadBoard() {
+    function loadBoard(cb) {
       $log.info('gameState loadBoard');
+      var alreadyTried = 1;
+      (function tryLoadingBoard() {
+        makeApiRequest('GET', 'board/', (err, response) => {
+          if (err) {
+            $log.error('Could not load the game board');
+            if (alreadyTried) {
+              $window.sessionStorage.setItem('authToken', null);
+              rerouteIfNeeded();
+            } else {
+              alreadyTried++;
+              tryLoadingBoard();
+            }
+          } else {
+            $window.localStorage.setItem('syGameBoard', response.board);
+            cb && cb();
+          }
+          
+        });
+      })();
       
     }
     
@@ -97,6 +127,20 @@
       
     }
     
+    /////////////////////////////////////
+    // HANDLES ALL THE CHANGES MADE AT THE START OF A TURN
+    function handleThisTurn() {
+      $log.info('gameState handleThisTurn');
+      
+      
+    }
+    
+    /////////////////////////////////////
+    // BUILD THE BOARD FOR THE CURRENT TURN
+    function buildBoardThisTurn() {
+      $log.info('gameState buildBoardThisTurn');
+      
+    }
     
     /////////////////////////////////////
     // CHECK IF A MOVE IS VALID
@@ -139,8 +183,20 @@
       (function poll() {
         $log.info('gameState poll');
         
-        
-        
+        makeApiRequest('GET', `games/${gameState.gameId}/`, (err, response) => {
+          if (err) {
+            $log.error(err);
+            gameState.pollDbForUpdate();
+          } else {
+            // THE OTHER USER HAS MOVED
+            if (response.lastUpdated === gameState.lastUpdated) {
+              gameState.handleThisTurn(response);
+            } else {
+              // CHECK EVERY MINUTE WHETHER THERE HAS BEEN A CHANGE
+              $timeout(gameState.pollDbForUpdate, 60000);
+            }
+          }
+        });
         
       })();
       
