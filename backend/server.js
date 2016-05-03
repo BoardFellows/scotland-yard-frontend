@@ -2,17 +2,24 @@
 
 const express       = require('express');
 const app           = express();
-const bodyParser    = require('body-parser');
-const API_URL       = process.env.API_URL || 'localhost:8080';
+// const bodyParser    = require('body-parser');
+// const API_URL       = process.env.API_URL || 'localhost:8080';
 
 
 // Define request proxy options
-const requestProxy  = require('express-request-proxy')
+// const requestProxy  = require('express-request-proxy');
 
 // TODO: implement the proxy requests
-app.use('/requestProxy/:path', requestProxy({
-  url: `${API_URL}/:path`
-}));
+// app.use('/requestProxy/:path', requestProxy({
+//   url: `${API_URL}/:path`
+// }));
+
+// app.use('/requestProxy/:path', (req, res) => {
+//   console.log('REQUEST MADE TO /requestProxy');
+//   console.log(API_URL);
+//   console.log(req.params.path);
+//   console.log(req.params);
+// });
 
 app.use('/', express.static(__dirname + '/../frontend/build'));
 

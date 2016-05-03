@@ -1,12 +1,13 @@
 (function() {
   angular.module('syServices')
-    .factory('gameState', ['$log', '$timeout', gameState]);
+    .factory('gameState', ['$log', '$timeout', '$routeParams','makeApiRequest', gameState]);
   
-  function gameState($log, $timeout) {
+  function gameState($log, $timeout, $routeParams, makeApiRequest) {
     const gameState               = {};
-    gameState.board               = localStorage.get('board') || null;
-    gameState.lastUpdated         = null;
+    gameState.board               = localStorage.getItem('board') || null;
+    gameState.game                = {};
     gameState.turns               = [];
+    gameState.lastUpdated         = null;
     gameState.turnsUntilMrXRevel  = 3;
     
     gameState.userType            = null;
@@ -16,34 +17,75 @@
     
     gameState.createGame          = createGame;
     gameState.initialize          = initialize;
+    gameState.buildInitGameState  = buildInitGameState;
+    gameState.loadBoard           = loadBoard;
     gameState.loadGame            = loadGame;
     gameState.checkMove           = checkMove;
     gameState.makeMove            = makeMove;
     gameState.getMovesFromNode    = getMovesFromNode;
     gameState.getNextPlayerToMove = getNextPlayerToMove;
-    
+    gameState.pollDbForUpdate     = pollDbForUpdate;
     
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
-    // METHODS
+    // METHODS 
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
     
     
     /////////////////////////////////////
     // CREATE A NEW GAME
-    function createGame() {
+    function createGame(currentPlayerRole, otherPlayerEmail, cb) {
       $log.info('gameState createGame');
       
+      // TODO: figure out what data needs to be included here
+      let newGameObj = {
+        currentPlayerRole, 
+        otherPlayerEmail
+      };
+      
+      makeApiRequest('POST', 'games', (err, response) => {
+        if (err) {
+          $log.error(err);
+          
+        } else {
+          $log.log('SUCCESSFULLY CREATED NEW GAME');
+          gameState.buildInitGameState(response);
+        }
+      }, newGameObj);
+    }
+    
+    /////////////////////////////////////
+    // TAKES RESPONSE FROM SERVER AND INITIALIZES VARIABLES
+    function buildInitGameState(gameData) {
+      $log.info('gameState buildInitGameState');
+      gameState.game   = gameData;
+      gameState.turns  = gameData.turns;
       
     }
+    
     
     /////////////////////////////////////
     // GET ALL DATA NEEDED FOR GAME START
     function initialize(cb) {
       $log.info('gameState initialize');
       // CHECK IF NEED TO LOAD BOARD
+      if (!gameState.board) {
+        gameState.loadBoard();
+      }
+      
       // CHECK IF NEED TO LOAD GAME
+      if (!gameState.game) {
+        gameState.loadGame($routeParams.gameId);
+      }
+      
+    }
+    
+    
+    /////////////////////////////////////
+    // GET BOARD DATA
+    function loadBoard() {
+      $log.info('gameState loadBoard');
       
     }
     
@@ -91,7 +133,7 @@
     
     /////////////////////////////////////
     // ASK THE DATABASE FOR UPDATES ON TIMER UNTIL THE OTHER PLAYER MOVES
-    function pollDatabaseForUpdate() {
+    function pollDbForUpdate() {
       $log.info('gameState createGame');
       
       (function poll() {

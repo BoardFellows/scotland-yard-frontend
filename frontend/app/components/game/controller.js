@@ -1,8 +1,8 @@
 (function() {
   angular.module('syGame', [])
-    .controller('GameController', ['$log', '$routeParams', 'requestProxy',  GameController]);
+    .controller('GameController', ['$log', '$routeParams', 'makeApiRequest',  GameController]);
   
-  function GameController($log, $routeParams, requestProxy) {
+  function GameController($log, $routeParams, makeApiRequest) {
     const vm = this;
     vm.gameId = $routeParams.gameId;
     

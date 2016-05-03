@@ -1,8 +1,8 @@
 (function() {
   angular.module('syLogin', ['syServices'])
-    .controller('LoginController', ['$log', '$location', '$route', 'requestProxy', LoginController]);
+    .controller('LoginController', ['$log', '$location', '$route', 'makeApiRequest', LoginController]);
     
-  function LoginController($log, $location, $route, requestProxy) {
+  function LoginController($log, $location, $route, makeApiRequest) {
     const vm                      = this;
     vm.test                       = null;
     vm.errorMessage               = null;
@@ -55,7 +55,7 @@
     /////////////////////////////////////
     // REROUTE THEM IF THEY'RE ALREADY LOGGED IN
     function initialize() {
-      if (sessionStorage.get('authToken')) {
+      if (sessionStorage.getItem('authToken')) {
         $location.url('/games');
         $route.reload();
       }  
@@ -76,7 +76,7 @@
         };
         
         // MAKE THE REQUEST
-        requestProxy('GET', 'users', (err, response) => {
+        makeApiRequest('GET', 'users', (err, response) => {
           if (err) {
             throw new Error('There was a problem creating your account.');
           } else {
@@ -108,9 +108,10 @@
           throw new Error('Your passwords must match');
         }
         delete vm.newUser.passwordConfirm;
+        delete vm.newUser.password;
         
         // MAKE THE REQUEST
-        requestProxy('POST', 'users', (err, response) => {
+        makeApiRequest('POST', 'users/', (err, response) => {
           if (err) {
             throw new Error('There was a problem creating your account.');
           } else {
