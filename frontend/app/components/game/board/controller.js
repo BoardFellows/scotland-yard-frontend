@@ -18,7 +18,7 @@
     
     // SETUP METHODS
     vm.intitialize          = initialize;
-    vm.drawIntialMap        = drawIntialMap;
+    vm.drawInitialMap       = drawInitialMap;
     vm.drawNodesOntoMap     = drawNodesOntoMap;
     vm.drawEdgesOntoMap     = drawEdgesOntoMap;
     vm.drawInitialPlayers   = drawInitialPlayers;
@@ -57,7 +57,7 @@
       
     }
     
-    function drawIntialMap() {
+    function drawInitialMap() {
       vm.map = new google.maps.Map({
         center: new google.maps.LatLng(51.506393, -0.127739), 
         zoom: 14, 

@@ -11,12 +11,16 @@
     vm.createGameFormHidden     = true;
     vm.createGameButText        = 'New Game';
     vm.games                    = [];
+    vm.friends                  = [];
+    vm.gameCreateorIsMrX        = true;
+    vm.otherPlayer              = null;
+    vm.errorMessage             = null;
+    
     vm.initialize               = initialize;
     vm.toggleCreateGameVisible  = toggleCreateGameVisible;
-    vm.joinGameById             = joinGameById;
     vm.createNewGame            = createNewGame;
     
-    
+    //TODO: implement friends list
     
     /////////////////////////////////////
     // METHODS
@@ -26,25 +30,30 @@
     // REROUTE TO LOGIN IF NEEDED, OTHERWISE SET GAMES 
     function initialize() {
       $log.info('GamesController initialize');
-      rerouteIfNeeded();
-      
+      // rerouteIfNeeded();
+      vm.games    = gameState.user.profile.games;
+      vm.friends  = gameState.user.profile.friends;
     }
     
     function toggleCreateGameVisible() {
       $log.info('GamesController toggleCreateGameVisible');
       vm.createGameFormHidden = !vm.createGameFormHidden;
-      vm.createGameButText = (vm.createGameButText === 'New Game') ? 'Your Games' : 'New Game';
+      vm.createGameButText    = (vm.createGameButText === 'New Game') ? 'Your Games' : 'New Game';
     }
     
-    function joinGameById(gameId) {
-      $log.info('GamesController joinGameById');
-      
-      
-    }
     
     function createNewGame() {
       $log.info('GamesController createNewGame');
-      
+      vm.errorMessage = null;
+      gameState.createGame(vm.gameCreateorIsMrX, vm.otherPlayer, (err, response) => {
+        $log.info('GamesController createNewGame callback');
+        if (err) {
+          vm.errorMessage = 'There was an error creating your game.';
+        } else {
+          $location.url(`/games/${gameState.game.id}`);
+          $route.reload();
+        }
+      });
       
     }
     

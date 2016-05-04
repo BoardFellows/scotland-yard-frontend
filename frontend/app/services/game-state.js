@@ -4,32 +4,45 @@
   
   function gameState($log, $window, $timeout, $routeParams, makeApiRequest, rerouteIfNeeded) {
     const gameState               = {};
-    gameState.board               = $window.localStorage.getItem('board') || null;
-    gameState.gameId              = null;
-    gameState.game                = {};
-    gameState.turns               = [];
-    gameState.lastUpdated         = null;
-    gameState.turnsUntilMrXReveal = null;
     
+    // general required information
+    gameState.user                = {};
+    gameState.board               = $window.localStorage.getItem('syGameBoard') ? angular.fromJson($window.localStorage.getItem('syGameBoard')) : null;
+    
+    // game management
+    gameState.gameId              = $routeParams.gameId;
+    gameState.game                = {};
+    
+    // turn management
+    gameState.turns               = [];
+    gameState.turnsUntilMrXReveal = null;
+    gameState.mostRecentETag      = null;
+    
+    // user/player management
     gameState.userType            = null;
     gameState.usersTurn           = false;
     gameState.otherUser           = null;
-    
     gameState.players             = [];
     gameState.playerToMove        = null;
     
+    // 1 time methods
     gameState.createGame          = createGame;
     gameState.initialize          = initialize;
     gameState.buildInitGameState  = buildInitGameState;
     gameState.loadBoard           = loadBoard;
     gameState.loadGame            = loadGame;
+    
+    // every turn method
     gameState.handleThisTurn      = handleThisTurn;
     gameState.buildBoardThisTurn  = buildBoardThisTurn;
     gameState.checkMove           = checkMove;
     gameState.makeMove            = makeMove;
-    gameState.getMovesFromNode    = getMovesFromNode;
     gameState.getNextPlayerToMove = getNextPlayerToMove;
+    gameState.handleDbResponse    = handleDbResponse;
     gameState.pollDbForUpdate     = pollDbForUpdate;
+    
+    // more often then 1x per turn
+    gameState.getMovesFromNode    = getMovesFromNode;
     
     
     //////////////////////////////////////////////////////////////////////////
@@ -41,22 +54,20 @@
     
     /////////////////////////////////////
     // CREATE A NEW GAME
-    function createGame(currentPlayerRole, otherPlayerEmail, cb) {
+    function createGame(gameCreateorIsMrX, otherPlayer, cb) {
       $log.info('gameState createGame');
       
       // TODO: figure out what data needs to be included here
-      let newGameObj = {
-        currentPlayerRole, 
-        otherPlayerEmail
-      };
+      let newGameObj = { gameCreateorIsMrX, otherPlayer };
       
       makeApiRequest('POST', 'games/', (err, response) => {
         if (err) {
           $log.error(err);
-          
+          cb && cb(err);
         } else {
           $log.log('SUCCESSFULLY CREATED NEW GAME');
           gameState.buildInitGameState(response);
+          cb && cb(null, response);
         }
       }, newGameObj);
     }
@@ -73,9 +84,9 @@
     
     /////////////////////////////////////
     // GET ALL DATA NEEDED FOR GAME START
+    // TODO: put callback in
     function initialize(cb) {
       $log.info('gameState initialize');
-      gameState.gameId = $routeParams.gameId;
       
       // CHECK IF NEED TO LOAD BOARD
       if (!gameState.board) {
@@ -106,13 +117,13 @@
             $log.error('Could not load the game board');
             if (alreadyTried) {
               $window.sessionStorage.setItem('authToken', null);
-              rerouteIfNeeded();
+              // rerouteIfNeeded();
             } else {
               alreadyTried++;
               tryLoadingBoard();
             }
           } else {
-            $window.localStorage.setItem('syGameBoard', response.board);
+            $window.localStorage.setItem('syGameBoard', angular.toJson(response.board));
             cb && cb();
           }
           
@@ -168,6 +179,13 @@
       
     }
     
+    /////////////////////////////////////
+    // HANDLES THE RESPONSE FROM THE DATABASE IN RESPONSE TO A MOVE
+    function handleDbResponse(respnse) {
+      $log.info('gameState handleDbResponse');
+      
+    }
+    
     
     /////////////////////////////////////
     // FIGURE OUT WHICH PLAYER GETS TO MOVE NEXT
@@ -190,10 +208,12 @@
             $log.error(err);
             gameState.pollDbForUpdate();
           } else {
+            
             // THE OTHER USER HAS MOVED
-            if (response.lastUpdated === gameState.lastUpdated) {
+            if (response.eTag !== gameState.mostRecentETag) {
               gameState.handleThisTurn(response);
             } else {
+              
               // CHECK EVERY MINUTE WHETHER THERE HAS BEEN A CHANGE
               $timeout(gameState.pollDbForUpdate, 60000);
             }

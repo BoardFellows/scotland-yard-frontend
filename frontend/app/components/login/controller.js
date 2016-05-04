@@ -1,8 +1,8 @@
 (function() {
   angular.module('syLogin', ['syServices'])
-    .controller('LoginController', ['$log', '$window', '$location', '$route', 'makeApiRequest', LoginController]);
+    .controller('LoginController', ['$log', '$window', '$location', '$route', 'makeApiRequest', 'gameState', LoginController]);
     
-  function LoginController($log, $window, $location, $route, makeApiRequest) {
+  function LoginController($log, $window, $location, $route, makeApiRequest, gameState) {
     const vm                      = this;
     vm.test                       = null;
     vm.errorMessage               = null;
@@ -76,11 +76,13 @@
         };
         
         // MAKE THE REQUEST
-        makeApiRequest('GET', 'users', (err, response) => {
+        makeApiRequest('GET', 'users/', (err, response) => {
           if (err) {
             throw new Error('There was a problem creating your account.');
           } else {
-            $window.sessionStorage.setItem('authToken', response.data.token);
+            delete response.password;
+            $window.sessionStorage.setItem('authToken', response.authToken);
+            gameState.user = response;
             $location.url('/games');
             $route.reload();
           }
@@ -94,7 +96,6 @@
       
     }
     
-    
     /////////////////////////////////////
     // CREATE A NEW ACCOUNT
     function createUser() {
@@ -102,20 +103,22 @@
       try {
         // ELIMINATE INVALID REQUESTS
         if (!(vm.newUser.username && vm.newUser.email && vm.newUser.password && vm.newUser.passwordConfirm)) {
-          throw new Error('Please complete filling out the form.');
+          throw new Error('Please complete filling out the faaorm.');
         } 
         if (vm.newUser.password !== vm.newUser.passwordConfirm) {
           throw new Error('Your passwords must match');
         }
         delete vm.newUser.passwordConfirm;
-        delete vm.newUser.password;
-        
+
         // MAKE THE REQUEST
         makeApiRequest('POST', 'users/', (err, response) => {
           if (err) {
             throw new Error('There was a problem creating your account.');
           } else {
-            $window.sessionStorage.setItem('authToken', response.data.token);
+            delete response.password;
+            $log.log('loginCtrl callback', response);
+            $window.sessionStorage.setItem('authToken', response.authToken);
+            gameState.user = response; //TODO: figure out a better way to handle storing the user's data
             $location.url('/games');
             $route.reload();
           }

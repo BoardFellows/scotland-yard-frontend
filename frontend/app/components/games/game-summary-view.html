@@ -1,6 +1,7 @@
-<article class="">
-  <!-- TODO: figure out what this should be bound to, may need to build value for myself -->
-  <h4 data-ng-bind="game.otherUser"></h>
+<article class="well">
   
-  <button type="button" name="button" data-ng-click="joinGameById()">View Game</button>
+  <h3 data-ng-bind="game.otherPlayerUsername"></h3>
+  <h5 data-ng-bind="game.status"></h5>
+  <a href="/games/{{game.id}}" data-ng-click="joinGameById()" class="btn" role="button">View Game</a>
+  
 </article>

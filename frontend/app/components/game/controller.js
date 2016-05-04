@@ -17,7 +17,7 @@
     // THIS WILL BRING IN THE INFORMATION ABOUT THE GAME
     function initialize() {
       $log.info('GameController initialize');
-      rerouteIfNeeded();
+      // rerouteIfNeeded();
       
     }
     

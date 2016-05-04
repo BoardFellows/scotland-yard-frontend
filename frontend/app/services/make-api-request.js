@@ -10,11 +10,13 @@
       // BUILD THE REQUEST
       let requestParams = {
         method: method.toUpperCase(),
-        url: `http://ec2-52-27-31-102.us-west-2.compute.amazonaws.com/${path}`  
+        // url: `/requestProxy/${path}`
+        url: `http://ec2-52-27-31-102.us-west-2.compute.amazonaws.com/${path}`   
       };
       if (data) { 
-        requestParams.data = data;
+        requestParams.data    = data;
       }
+      
       // USEFUL FOR LOG IN ONLY
       if (headers) {
         requestParams.headers = headers;
@@ -31,6 +33,11 @@
       $http(requestParams).then((response) => {
         $log.debug('SUCCESS IN makeApiRequest');
         $log.log(response);
+        $log.log(response.headers('authToken'));
+        if (response.headers('authToken') && (path === 'users/')) {
+          response.data.authToken = response.headers('authToken');
+        }
+        
         cb && cb(null, response.data);
       }, (err) => {
         $log.error('ERROR IN makeApiRequest: ', err);
