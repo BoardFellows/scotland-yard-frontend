@@ -13,6 +13,8 @@
     
     gameState.userType            = null;
     gameState.usersTurn           = false;
+    gameState.otherUser           = null;
+    
     gameState.players             = [];
     gameState.playerToMove        = null;
     

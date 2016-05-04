@@ -18,6 +18,7 @@
     function initialize() {
       $log.info('GameController initialize');
       rerouteIfNeeded();
+      
     }
     
   }

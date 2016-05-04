@@ -28,9 +28,6 @@
       $log.info('GamesController initialize');
       rerouteIfNeeded();
       
-      
-      // vm.games = 
-      
     }
     
     function toggleCreateGameVisible() {
@@ -56,7 +53,7 @@
   
   // CONTROLLER FOR THE GAME SUMMARY DIRECTIVES
   function GameSummaryController($log, $scope) {
-    const vm = this;
+    // const vm = this;
     
     
   }
