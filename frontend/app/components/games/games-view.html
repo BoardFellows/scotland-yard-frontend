@@ -1,0 +1,64 @@
+<section class="container" data-ng-init="gamesCtrl.initialize()">
+  <sy-navbar></sy-navbar>
+  
+  <button 
+    type="button" 
+    name="showCreateGameFormButton" 
+    class="btn" data-ng-class="{ 'btn-primary': gamesCtrl.createGameFormHidden }" 
+    data-ng-bind="gamesCtrl.createGameButText" 
+    data-ng-click="gamesCtrl.toggleCreateGameVisible()"
+  ></button>
+  
+  <div data-ng-hide="gamesCtrl.createGameFormHidden">
+    <form  novalidate class="container syNewGame">
+      
+      <fieldset class="form-group row">
+        <label for="syNewGame__otherPlayer" class="col-sm-2">Invite by email:</label>
+        <div class="col-sm-10">
+          <input type="text" name="name"class="form-control" id="syNewGame__otherPlayer" data-ng-model="gamesCtrl.otherPlayer" />
+        </div>
+      </fieldset>
+      
+      <fieldset class="form-group row" data-ng-show="gamesCtrl.friends.length">
+        <label for="syNewGame__friendSelect" class="col-sm-2">Or choose a friend:</label>
+        <div class="col-sm-10" id="syNewGame__friendSelect">
+          <div class="" data-ng-repeat="friend in gamesCtrl.friends">
+            <label>
+              <input type="radio" value="{{ friend.id }}" /> <span data-ng-bind="friend.username"></span>
+            </label>
+          </div>
+        </div>
+      </fieldset>
+      
+      <fieldset class="form-group row">
+        <label class="col-sm-2">Choose Mr. X: </label>
+        <div class="col-sm-10">
+          
+          <div class="radio">
+            <label>
+              <input type="radio" name="gameCreateorIsMrX" value="true" checked data-ng-model="gamesCtrl.gameCreateorIsMrX">
+              They're chasing me!
+            </label>
+          </div>
+          
+          <div class="radio">
+            <label>
+              <input type="radio" name="gameCreateorIsMrX" value="false" data-ng-model="gamesCtrl.gameCreateorIsMrX">
+              I'm chasing them!
+            </label>
+          </div>
+          
+        </div>
+      </fieldset>
+      
+      <button type="button" name="newGameButton" class="btn btn-primary" data-ng-click="gamesCtrl.createNewGame()">Start game!</button>
+    
+    </form>
+  </div>
+  
+  <div data-ng-repeat="game in gamesCtrl.games | orderBy: 'lastUpdated'" data-ng-show="gamesCtrl.createGameFormHidden">
+    <game-summary data-game="game" data-joinGameById="gamesCtrl.joinGameById(game.id)"></game-summary>
+  </div>
+  
+  
+</section>

@@ -1,0 +1,77 @@
+<section data-ng-init="loginCtrl.initialize()" class="">
+  
+  <h1 data-ng-bind="loginCtrl.errorMessage" class="error-message"></h1>
+  
+  
+  <form novalidate data-ng-show="loginCtrl.loginFormVisable" class="syLogin container">
+    
+    <fieldset class="form-group row">
+      <label for="syLogin__username" class="col-sm-2 form-control-label">Username:</label>
+      <div class="col-sm-10">
+        <input type="text" data-ng-model="loginCtrl.user.username" placeholder="Username" class="form-control" id="syLogin__username"/>
+      </div>
+    </fieldset>
+    
+    <fieldset class="form-group row">
+      <label for="syLogin__password" class="col-sm-2 form-control-label">Password:</label>
+      <div class="col-sm-10">
+        <input type="password"  data-ng-model="loginCtrl.user.password" placeholder="Password" class="form-control" id="syLogin__password"/>
+      </div>
+    </fieldset>
+    
+    <div class="form-group row">
+      <div class="col-sm-1">
+        <button type="button" data-ng-click="loginCtrl.loginUser()"  class="btn btn-primary">Login</button>
+      </div>
+      <div class="col-sm-2 col-sm-offset-1">
+        <button type="button" data-ng-click="loginCtrl.toogleWhichFormIsVisable()" class="btn btn-secondary">Create an account</button>
+      </div>
+    </div>
+    
+  </form>
+  
+  
+  
+  <form novalidate data-ng-show="loginCtrl.createUserFormVisable" class="syCreateUser container">
+    
+    <fieldset class="form-group row">
+      <label for="syCreateUser__username" class="col-sm-2 form-control-label">Username:</label>
+      <div class="col-sm-10">
+        <input type="text" data-ng-model="loginCtrl.newUser.username" placeholder="CaptainPicard" class="form-control" id="syCreateUser__username"/>
+      </div>
+    </fieldset>
+    
+    <fieldset class="form-group row">
+      <label for="syCreateUser__email" class="col-sm-2 form-control-label">Email:</label>
+      <div class="col-sm-10">
+        <input type="text" data-ng-model="loginCtrl.newUser.email" placeholder="picard@gmail.com" class="form-control" id="syCreateUser__email"/>
+        <small class="text-muted">We'll never share your email</small>
+      </div>
+    </fieldset>
+    
+    <fieldset class="form-group row">
+      <label for="syCreateUser__password" class="col-sm-2 form-control-label">Password:</label>
+      <div class="col-sm-10">
+        <input type="password" data-ng-model="loginCtrl.newUser.password" placeholder="Password" class="form-control" id="syCreateUser__password"/>
+      </div>
+    </fieldset>
+    
+    <fieldset class="form-group row">
+      <label for="syCreateUser__passwordConfirm" class="col-sm-2 form-control-label">Confirm password:</label>
+      <div class="col-sm-10">
+        <input type="password" data-ng-model="loginCtrl.newUser.passwordConfirm" placeholder="Confirm password" class="form-control" id="syCreateUser__passwordConfirm"/>
+      </div>
+    </fieldset>
+    
+    <div class="form-group row">
+      <div class="col-sm-1">
+        <button type="button" data-ng-click="loginCtrl.createUser()" class="btn btn-primary">Create account</button>
+      </div>
+      <div class="col-sm-2 col-sm-offset-1">
+        <button type="button" data-ng-click="loginCtrl.toogleWhichFormIsVisable()" class="btn btn-secondary">Sign in instead</button>
+      </div>
+    </div>
+    
+  </form>
+  
+</section>
