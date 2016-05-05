@@ -22,8 +22,13 @@
     vm.playerSvg                      = require(__dirname + '/board/player-svg.js');
     
     // MAP RELATED 
-    vm.map                            = null; 
+    vm.map                            = null;
     vm.mapHolder                      = angular.element(document.querySelector('#map_canvas'))[0];
+    vm.viewBounds                     = new google.maps.LatLngBounds(
+      new google.maps.LatLng(51.48066238846036,  -0.19279329744723128),
+      new google.maps.LatLng(51.54394811922664, -0.07118730513003158)
+    ); 
+    vm.lastValidMapCenter             = vm.viewBounds.getCenter();
     
     // OBJECTS DRAWN ONTO MAP, NODES STORED ON vm.coords
     vm.playerMarkers                  = {};
@@ -86,9 +91,9 @@
         .catch((err) => {
           $log.error('ERROR IN CATCH BLOCK FOR ALL MAP INIT METHODS');
           $log.error(err);
-          $window.sessionStorage.setItem('authToken', angular.toJson(null));
-          $window.sessionStorage.setItem('user', angular.toJson(null));
-          rerouteIfNeeded();
+          // $window.sessionStorage.setItem('authToken', angular.toJson(null));
+          // $window.sessionStorage.setItem('user', angular.toJson(null));
+          // rerouteIfNeeded();
         });
     }
     
@@ -106,21 +111,30 @@
     // THIS DRAWS THE MAP
     function initializeMap() {
       $log.info('GameController initializeMap');
-      vm.map = new google.maps.Map({
-        center:             new google.maps.LatLng(51.506393, -0.127739), 
-        zoom:               14, 
-        minZoom:            13, 
-        maxZoom:            16,
-        mapTypeId:          google.maps.MapTypeId.ROADMAP, 
-        styles:             vm.mapStyle,
-        disableDefaulUI:    true,
-        zoomControl:        true,
-        mapTypeControl:     false,
-        scaleControl:       true,
-        streetViewControl:  false,
-        rotateControl:      false,
-        fullScreenControl:  false
-      });
+      vm.map = new google.maps.Map(vm.mapHolder, 
+        {
+          center:             vm.viewBounds.getCenter(), 
+          // center:             new google.maps.LatLng(51.50927777036186, -0.13014225927737044),   
+          zoom:               13, 
+          minZoom:            13, 
+          maxZoom:            17,
+          mapTypeId:          google.maps.MapTypeId.ROADMAP, 
+          styles:             vm.mapStyle,
+          disableDefaulUI:    true,
+          zoomControl:        true,
+          mapTypeControl:     false,
+          scaleControl:       true,
+          streetViewControl:  false,
+          rotateControl:      false,
+          fullScreenControl:  false
+        }
+      );
+      // vm.viewRect = new google.maps.Rectangle({
+      //   map: vm.map,
+      //   bounds: vm.viewBounds
+      // });
+      $log.log(vm.map);
+      $log.log(vm.viewRect);
     }
 
     
@@ -128,18 +142,17 @@
     function initializeNodesOntoMap() {
       $log.info('GameController drawNodesOntoMap');
       gameState.nodeList.forEach((node) => {
-        let markerInfo = vm.coords(node);
+        let markerInfo = vm.coords[node];
         markerInfo.marker = new google.maps.Marker({
           position: new google.maps.LatLng(markerInfo.coords[0], markerInfo.coords[1]),
-          map: vm.map,
+          map:      vm.map,
           icon: {
-            url: vm.nodeSvg(node, gameState.board[node]),
+            url:    vm.nodeSvg(node, gameState.board[node]),
             anchor: new google.maps.Point(16, 16)
           }
         });
       });
     }
-    
     
     // DRAWS ALL PATHS ONTO THE MAP
     function initializeEdgesOntoMap() {
@@ -158,7 +171,15 @@
     // ATTACHES ALL LISTENERS TO THE MAP
     function initializeMapEventListeners() {
       $log.info('GameController attachListeners');
-      
+      vm.map.addListener('center_changed', function() {
+        let viewCenter = vm.map.getCenter();
+        if (!vm.viewBounds.contains(viewCenter)) {
+          vm.map.setCenter(vm.lastValidMapCenter);
+        } else {
+          vm.lastValidMapCenter = viewCenter;
+        }
+        
+      });
     }
     
     

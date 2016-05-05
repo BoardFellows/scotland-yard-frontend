@@ -2,11 +2,11 @@ module.exports = function returnNodeSvgMapMarker(text, node) {
   let mapMarkerSpec = {
     height: 20,
     width: 20, 
-    outlineColor: (node.underground) ? '#D62700' : '#002A4A',
+    outlineColor: (node.underground.length) ? '#D62700' : '#002A4A',
     strokeWidth: 2,
     topColor: '#E3D6B7',
-    botColor: (node.bus) ? '#17607D' : '#E3D6B7',
-    boxStroke: (node.underground) ? '#D62700' : '#002A4A',
+    botColor: (node.bus.length) ? '#17607D' : '#E3D6B7',
+    boxStroke: (node.underground.length) ? '#D62700' : '#002A4A',
     boxFill: '#FFFFFF', 
     textStroke: '#002A4A'     
   };

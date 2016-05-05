@@ -73,12 +73,12 @@
       }, newGameObj);
     }
     
+    
     /////////////////////////////////////
     // GET ALL DATA NEEDED FOR GAME START
     // TODO: put callback in
     function initialize() {
       $log.info('gameState initialize');
-      
       let loadBoard = new Promise((resolve, reject) => {
         if (gameState.board) {
           resolve(true);
@@ -92,7 +92,6 @@
           });
         }
       });
-      
       let loadGame = new Promise((resolve, reject) => {
         gameState.loadGame(gameState.gameId, (err, response) => {
           if (err) {
@@ -102,7 +101,6 @@
           }
         });
       });
-      
       return Promise.all([loadBoard, loadGame]);
     }
     
@@ -122,7 +120,7 @@
     function loadGame(gameId, cb) {
       $log.info('gameState loadGame');
       if (!gameState.game) {
-        makeApiRequest('GET', `games/${gameState.gameId}`, (err, response) => {
+        makeApiRequest('GET', `games/${gameState.gameId}/`, (err, response) => {
           if (err) {
             cb && cb(err);
           } else {
@@ -148,9 +146,9 @@
                 if (cb) {
                   cb(err);
                 } else {
-                  $window.sessionStorage.setItem('authToken', angular.toJson(null));
-                  $window.sessionStorage.setItem('user', angular.toJson(null));
-                  rerouteIfNeeded();
+                  // $window.sessionStorage.setItem('authToken', angular.toJson(null));
+                  // $window.sessionStorage.setItem('user', angular.toJson(null));
+                  // rerouteIfNeeded();
                 }
               } else {
                 alreadyTried++;
