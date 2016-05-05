@@ -7,7 +7,7 @@
     
     // general required information
     gameState.user                = null;
-    gameState.board               = $window.localStorage.getItem('syGameBoard') ? angular.fromJson($window.localStorage.getItem('syGameBoard')) : null;
+    gameState.board               = angular.fromJson($window.localStorage.getItem('syGameBoard')) ? angular.fromJson($window.localStorage.getItem('syGameBoard')) : null;
     
     // game management
     gameState.gameId              = $routeParams.gameId;
@@ -90,7 +90,7 @@
       
       // CHECK IF NEED TO LOAD BOARD
       if (!gameState.board) {
-        gameState.loadBoard(() => {
+        gameState.loadBoard((err, response) => {
           // CHECK IF NEED TO LOAD GAME
           if (!gameState.game) {
             gameState.loadGame(gameState.gameId);
@@ -106,30 +106,35 @@
     }
     
     
+    
     /////////////////////////////////////
     // GET BOARD DATA
     function loadBoard(cb) {
       $log.info('gameState loadBoard');
       var alreadyTried = 1;
       (function tryLoadingBoard() {
-        makeApiRequest('GET', 'board/', (err, response) => {
+        makeApiRequest('GET', 'board', (err, response) => {
           if (err) {
             $log.error('Could not load the game board');
             if (alreadyTried) {
-              $window.sessionStorage.setItem('authToken', null);
-              rerouteIfNeeded();
+              if (cb) {
+                cb(err);
+              } else {
+                $window.sessionStorage.setItem('authToken', angular.toJson(null));
+                $window.sessionStorage.setItem('user', angular.toJson(null));
+                rerouteIfNeeded();
+              }
             } else {
               alreadyTried++;
               tryLoadingBoard();
             }
           } else {
-            $window.localStorage.setItem('syGameBoard', angular.toJson(response.board));
-            cb && cb();
+            gameState.board = response;
+            $window.localStorage.setItem('syGameBoard', angular.toJson(response));
+            cb && cb(null, response);
           }
-          
         });
       })();
-      
     }
     
     

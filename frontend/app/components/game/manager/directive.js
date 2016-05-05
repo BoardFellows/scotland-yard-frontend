@@ -9,6 +9,7 @@
       controller: 'ManagerController',
       controllerAs: 'mngCtrl'
     };
+    
   }
-  
+
 })();

@@ -3,7 +3,7 @@
 }
 
 
-.map_holder {
+.map-holder {
   position: relative;
   height: 100vh;
   width: 100vw;
@@ -15,5 +15,4 @@
   left: 10%;
   height: 80%;
   width: 80%;
-  background-color: red;
 }

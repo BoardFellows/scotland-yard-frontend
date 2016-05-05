@@ -1,4 +1,4 @@
-/* global google */ 
+
 
 (function() {
   angular.module('syGame')
