@@ -78,7 +78,7 @@
         // MAKE THE REQUEST
         makeApiRequest('GET', 'users/', (err, response) => {
           if (err) {
-            throw new Error('There was a problem creating your account.');
+            throw new Error('There was a loggin you in.');
           } else {
             delete response.password;
             $window.sessionStorage.setItem('authToken', angular.toJson(response.authToken));

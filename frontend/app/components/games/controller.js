@@ -32,16 +32,16 @@
       $log.info('GamesController initialize');
       rerouteIfNeeded();
       if (!gameState.user) {
-        $log.warn('HAD TO GRAB USER INFO FROM SESSION STORAGE.');
-        gameState.user = angular.fromJson($window.sessionStorage.getItem('user'));
-        vm.games    = gameState.user.profile.games;
-        vm.friends  = gameState.user.profile.friends; 
+        $log.warn('GRABBED USER INFO FROM SESSION STORAGE.');
+        gameState.user  = angular.fromJson($window.sessionStorage.getItem('user'));
+        vm.games        = gameState.user.profile.games;
+        vm.friends      = gameState.user.profile.friends; 
       }  else {
         $log.warn('ELSE BLOCK');
         $log.log(gameState.user, typeof gameState.user);
         
-        vm.games    = gameState.user.profile.games;
-        vm.friends  = gameState.user.profile.friends; 
+        vm.games        = gameState.user.profile.games;
+        vm.friends      = gameState.user.profile.friends; 
       }
       // $log.log('GamesController initialize gameState.user is: ');
       // $log.log(gameState.user);

@@ -8,6 +8,7 @@
     // general required information
     gameState.user                = null;
     gameState.board               = angular.fromJson($window.localStorage.getItem('syGameBoard')) ? angular.fromJson($window.localStorage.getItem('syGameBoard')) : null;
+    gameState.nodeList            = (gameState.board) ? Object.keys(gameState.board) : null;
     
     // game management
     gameState.gameId              = $routeParams.gameId;
@@ -75,12 +76,34 @@
     /////////////////////////////////////
     // GET ALL DATA NEEDED FOR GAME START
     // TODO: put callback in
-    function initialize(cb) {
+    function initialize() {
       $log.info('gameState initialize');
-      gameState.loadBoard();
-      gameState.loadGame(gameState.gameId, () => {
-        
+      
+      let loadBoard = new Promise((resolve, reject) => {
+        if (gameState.board) {
+          resolve(true);
+        } else {
+          gameState.loadBoard((err, response) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(response);
+            }
+          });
+        }
       });
+      
+      let loadGame = new Promise((resolve, reject) => {
+        gameState.loadGame(gameState.gameId, (err, response) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(response);
+          }
+        });
+      });
+      
+      return Promise.all([loadBoard, loadGame]);
     }
     
     
@@ -134,7 +157,8 @@
                 tryLoadingBoard();
               }
             } else {
-              gameState.board = response;
+              gameState.board     = response;
+              gameState.nodeList  = Object.keys(gameState.board);
               $window.localStorage.setItem('syGameBoard', angular.toJson(response));
               cb && cb(null, response);
             }
