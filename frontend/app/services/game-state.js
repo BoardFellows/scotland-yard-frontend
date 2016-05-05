@@ -73,6 +73,18 @@
     }
     
     /////////////////////////////////////
+    // GET ALL DATA NEEDED FOR GAME START
+    // TODO: put callback in
+    function initialize(cb) {
+      $log.info('gameState initialize');
+      gameState.loadBoard();
+      gameState.loadGame(gameState.gameId, () => {
+        
+      });
+    }
+    
+    
+    /////////////////////////////////////
     // TAKES RESPONSE FROM SERVER AND INITIALIZES VARIABLES
     function buildInitGameState(gameData) {
       $log.info('gameState buildInitGameState');
@@ -83,67 +95,55 @@
     
     
     /////////////////////////////////////
-    // GET ALL DATA NEEDED FOR GAME START
-    // TODO: put callback in
-    function initialize(cb) {
-      $log.info('gameState initialize');
-      
-      // CHECK IF NEED TO LOAD BOARD
-      if (!gameState.board) {
-        gameState.loadBoard((err, response) => {
-          // CHECK IF NEED TO LOAD GAME
-          if (!gameState.game) {
-            gameState.loadGame(gameState.gameId);
+    // BRING A GAME IN FROM THE DATABASE
+    function loadGame(gameId, cb) {
+      $log.info('gameState loadGame');
+      if (!gameState.game) {
+        makeApiRequest('GET', `games/${gameState.gameId}`, (err, response) => {
+          if (err) {
+            cb && cb(err);
+          } else {
+            $log.info('SUCCESS loading game data by id');
+            gameState.buildInitGameState(response);
+            cb && cb(null, response);
           }
-        });
-        
-      } else {
-        // CHECK IF NEED TO LOAD GAME
-        if (!gameState.game) {
-          gameState.loadGame(gameState.gameId);
-        }
+        }); 
       }
     }
-    
-    
-    
+  
     /////////////////////////////////////
     // GET BOARD DATA
     function loadBoard(cb) {
       $log.info('gameState loadBoard');
-      var alreadyTried = 1;
-      (function tryLoadingBoard() {
-        makeApiRequest('GET', 'board', (err, response) => {
-          if (err) {
-            $log.error('Could not load the game board');
-            if (alreadyTried) {
-              if (cb) {
-                cb(err);
+      if (!gameState.board) {
+        let alreadyTried = 1;
+        (function tryLoadingBoard() {
+          makeApiRequest('GET', 'board', (err, response) => {
+            if (err) {
+              $log.error('Could not load the game board');
+              if (alreadyTried) {
+                if (cb) {
+                  cb(err);
+                } else {
+                  $window.sessionStorage.setItem('authToken', angular.toJson(null));
+                  $window.sessionStorage.setItem('user', angular.toJson(null));
+                  rerouteIfNeeded();
+                }
               } else {
-                $window.sessionStorage.setItem('authToken', angular.toJson(null));
-                $window.sessionStorage.setItem('user', angular.toJson(null));
-                rerouteIfNeeded();
+                alreadyTried++;
+                tryLoadingBoard();
               }
             } else {
-              alreadyTried++;
-              tryLoadingBoard();
+              gameState.board = response;
+              $window.localStorage.setItem('syGameBoard', angular.toJson(response));
+              cb && cb(null, response);
             }
-          } else {
-            gameState.board = response;
-            $window.localStorage.setItem('syGameBoard', angular.toJson(response));
-            cb && cb(null, response);
-          }
-        });
-      })();
+          });
+        })();
+      }
     }
     
-    
-    /////////////////////////////////////
-    // BRING A GAME IN FROM THE DATABASE
-    function loadGame(gameId) {
-      $log.info('gameState loadGame');
-      
-    }
+
     
     /////////////////////////////////////
     // HANDLES ALL THE CHANGES MADE AT THE START OF A TURN

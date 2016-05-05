@@ -1,4 +1,4 @@
-
+/* global google */
 
 (function() {
   angular.module('syGame')
@@ -49,29 +49,29 @@
         vm.drawIntialMap();
         vm.drawNodesOntoMap();
         vm.drawEdgesOntoMap();
-        vm.drawInitialPlayers();
-        let firstPlayer = gameState.getNextPlayerToMove();
-        vm.showMovesFromNode(firstPlayer.node.id); //TODO: make sure this formatting is consistent with theirs
-        vm.attachListeners();
+        // vm.drawInitialPlayers();
+        // let firstPlayer = gameState.getNextPlayerToMove();
+        // vm.showMovesFromNode(firstPlayer.node.id); //TODO: make sure this formatting is consistent with theirs
+        // vm.attachListeners();
       });
       
     }
     
     function drawInitialMap() {
       vm.map = new google.maps.Map({
-        center: new google.maps.LatLng(51.506393, -0.127739), 
-        zoom: 14, 
-        minZoom: 13, 
-        maxZoom: 16,
-        mapTypeId: google.maps.MapTypeId.ROADMAP, 
-        styles: mapStyle,
-        disableDefaulUI: true,
-        zoomControl: true,
-        mapTypeControl: false,
-        scaleControl: true,
-        streetViewControl: false,
-        rotateControl: false,
-        fullScreenControl: false
+        center:             new google.maps.LatLng(51.506393, -0.127739), 
+        zoom:               14, 
+        minZoom:            13, 
+        maxZoom:            16,
+        mapTypeId:          google.maps.MapTypeId.ROADMAP, 
+        styles:             mapStyle,
+        disableDefaulUI:    true,
+        zoomControl:        true,
+        mapTypeControl:     false,
+        scaleControl:       true,
+        streetViewControl:  false,
+        rotateControl:      false,
+        fullScreenControl:  false
       });
     }
     

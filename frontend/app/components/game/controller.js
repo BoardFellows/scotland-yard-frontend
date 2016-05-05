@@ -18,9 +18,8 @@
     function initialize() {
       $log.info('GameController initialize');
       rerouteIfNeeded();
-      gameState.loadBoard((err, response) => {
-        
-      });
+      gameState.loadBoard();
+      gameState.loadGame();
     }
     
     
