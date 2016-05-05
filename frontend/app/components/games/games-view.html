@@ -56,7 +56,8 @@
     </form>
   </div>
   
-  <div data-ng-repeat="game in gamesCtrl.games | orderBy: 'lastUpdated'" data-ng-show="gamesCtrl.createGameFormHidden">
+  <!-- data-ng-show="gamesCtrl.createGameFormHidden" -->
+  <div data-ng-repeat="game in gamesCtrl.games | orderBy: 'lastUpdated'">
     <game-summary data-game="game" data-joinGameById="gamesCtrl.joinGameById(game.id)"></game-summary>
   </div>
   

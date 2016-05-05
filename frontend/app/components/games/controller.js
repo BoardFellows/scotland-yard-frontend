@@ -43,13 +43,6 @@
         vm.games        = gameState.user.profile.games;
         vm.friends      = gameState.user.profile.friends; 
       }
-      // $log.log('GamesController initialize gameState.user is: ');
-      // $log.log(gameState.user);
-      // if (gameState.user) {
-      //   $log.warn(' TRUTHY gameState.user');
-      // }
-      // vm.games    = gameState.user.profile.games;
-      // vm.friends  = gameState.user.profile.friends;  
     }
     
     function toggleCreateGameVisible() {
@@ -71,17 +64,40 @@
           $route.reload();
         }
       });
-      
     }
+
+
+
+
     
   }
   
   
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   // CONTROLLER FOR THE GAME SUMMARY DIRECTIVES
   function GameSummaryController($log, $scope) {
-    // const vm = this;
+    const vm                = this;
+    vm.otherPlayerUsername  = null;
+    
+    vm.initialize           = initialize;
     
     
+    //TODO: make it so that it will figure out what the other player's username is
+    function initialize() {
+      $log.log('GameSummaryController initialize');
+      // if ()
+    }
   }
   
 })();

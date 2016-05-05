@@ -9,8 +9,8 @@
       
       let authToken = angular.fromJson($window.sessionStorage.getItem('authToken'));
       let user      = angular.fromJson($window.sessionStorage.getItem('user'));
-      $log.warn('authToken, user are:');
-      $log.log(authToken, user);
+      // $log.warn('authToken, user are:');
+      // $log.log(authToken, user);
 
       if (!authToken || !user) {  
         $log.warn('REROUTING TO LOGIN');

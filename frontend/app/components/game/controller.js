@@ -1,4 +1,6 @@
 /* global google */
+// TODO: figure out how to bring in xml stylesheets to specify the styling
+
 
 (function() {
   angular.module('syGame', ['syNav', 'syServices'])
@@ -55,13 +57,26 @@
     vm.askForTokenType                = askForTokenType;
     vm.processPayment                 = processPayment;
     vm.drawPlayerAtNode               = drawPlayerAtNode;
+    vm.drawEdgesFromNode              = drawEdgesFromNode;
     
     // GAMEPLAY METHODS
     vm.limitViewableMapArea           = limitViewableMapArea;
     vm.attachMapClickHandlers         = attachMapClickHandlers;
 
+    // DRAWING METHODS AND STYLES
+    vm.markerStyles                   = {};
+    vm.colors                         = {
+      taxi:         '#E3D6B7',
+      underground:  '#D62700',
+      bus:          '#17607D',
+      river:        '#000000',
+      outline:      '#002A4A',
+      fill:         '#FFFFFF'
+    };
+    vm.markerStyles.nodeStyle         = nodeStyle;
+    vm.markerStyles.edgeStyle         = edgeStyle;
+    // vm.markerStyles.playerStyle       = playerStyle;
     
-
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
@@ -80,21 +95,28 @@
     function initialize() {
       $log.info('GameController initialize');
       $log.log(gameState.board);
-      rerouteIfNeeded();  
-      gameState.initialize()
-        .then((responseBoardAndGameArray) => {
-          $log.log('going to show board');
-          vm.showBoard = true;
-          vm.callAllMapInitMethods();
-          vm.handleThisTurn();
-        })
-        .catch((err) => {
-          $log.error('ERROR IN CATCH BLOCK FOR ALL MAP INIT METHODS');
-          $log.error(err);
-          // $window.sessionStorage.setItem('authToken', angular.toJson(null));
-          // $window.sessionStorage.setItem('user', angular.toJson(null));
-          // rerouteIfNeeded();
-        });
+      rerouteIfNeeded(); 
+      if (!gameState.game || !gameState.board) {
+        gameState.initialize()
+          .then((responseBoardAndGameArray) => {
+            $log.log('going to show board');
+            vm.showBoard = true;
+            vm.callAllMapInitMethods();
+            vm.handleThisTurn();
+          })
+          .catch((err) => {
+            $log.error('ERROR IN CATCH BLOCK FOR ALL MAP INIT METHODS');
+            $log.error(err);
+            // $window.sessionStorage.setItem('authToken', angular.toJson(null));
+            // $window.sessionStorage.setItem('user', angular.toJson(null));
+            // rerouteIfNeeded();
+          });
+      } else {
+        vm.showBoard = true;
+        vm.callAllMapInitMethods();
+        vm.handleThisTurn();
+      }
+       
     }
     
     
@@ -113,8 +135,7 @@
       $log.info('GameController initializeMap');
       vm.map = new google.maps.Map(vm.mapHolder, 
         {
-          center:             vm.viewBounds.getCenter(), 
-          // center:             new google.maps.LatLng(51.50927777036186, -0.13014225927737044),   
+          center:             vm.viewBounds.getCenter(),    
           zoom:               13, 
           minZoom:            13, 
           maxZoom:            17,
@@ -129,12 +150,7 @@
           fullScreenControl:  false
         }
       );
-      // vm.viewRect = new google.maps.Rectangle({
-      //   map: vm.map,
-      //   bounds: vm.viewBounds
-      // });
       $log.log(vm.map);
-      $log.log(vm.viewRect);
     }
 
     
@@ -144,11 +160,11 @@
       gameState.nodeList.forEach((node) => {
         let markerInfo = vm.coords[node];
         markerInfo.marker = new google.maps.Marker({
-          position: new google.maps.LatLng(markerInfo.coords[0], markerInfo.coords[1]),
+          position: new google.maps.LatLng(markerInfo.coords),
           map:      vm.map,
           icon: {
-            url:    vm.nodeSvg(node, gameState.board[node]),
-            anchor: new google.maps.Point(16, 16)
+            url:    vm.nodeSvg(node, gameState.board[node], vm.markerStyles.nodeStyle),
+            anchor: new google.maps.Point(20, 20)
           }
         });
       });
@@ -157,6 +173,40 @@
     // DRAWS ALL PATHS ONTO THE MAP
     function initializeEdgesOntoMap() {
       $log.info('GameController drawEdgesOntoMap');
+      gameState.nodeList.forEach((nodeName) => {
+        let node        = gameState.board[nodeName];
+        var otherNodes  = {};
+        gameState.edgeTypes.forEach((type) => {
+          node[type].forEach((otherNodeName) => {
+            if (otherNodes[otherNodeName]) {
+              otherNodes[otherNodeName][type] = true;
+            } else {
+              otherNodes[otherNodeName] = {};
+              otherNodes[otherNodeName][type] = true;
+            }
+          });
+        });
+        $log.log(nodeName, otherNodes);
+        Object.keys(otherNodes).forEach((otherNodeName) => {
+          if (!vm.edgePolylines[`${otherNodeName}-${nodeName}`]) {
+            let edgeOptions = vm.markerStyles.edgeStyle(
+              vm.coords[nodeName].coords, 
+              vm.coords[otherNodeName].coords, 
+              otherNodes[otherNodeName].taxi,
+              otherNodes[otherNodeName].bus,
+              otherNodes[otherNodeName].underground,
+              otherNodes[otherNodeName].river
+            );
+            let edge = new google.maps.Polyline(edgeOptions);
+            vm.edgePolylines[`${otherNodeName}-${nodeName}`] = edge;
+            vm.edgePolylines[`${nodeName}-${otherNodeName}`] = edge;
+          }
+        });
+      });
+    }
+    
+    function drawEdgesFromNode() {
+      $log.info('GameController drawEdgesFromNode');
       
     }
     
@@ -171,15 +221,7 @@
     // ATTACHES ALL LISTENERS TO THE MAP
     function initializeMapEventListeners() {
       $log.info('GameController attachListeners');
-      vm.map.addListener('center_changed', function() {
-        let viewCenter = vm.map.getCenter();
-        if (!vm.viewBounds.contains(viewCenter)) {
-          vm.map.setCenter(vm.lastValidMapCenter);
-        } else {
-          vm.lastValidMapCenter = viewCenter;
-        }
-        
-      });
+      vm.limitViewableMapArea();
     }
     
     
@@ -239,18 +281,91 @@
     // PREVENTS THE PLAYER FROM GOING TO ANOTHER AREA OF THE MAP
     function limitViewableMapArea() {
       $log.info('GameController limitViewableArea');
-      
+      vm.map.addListener('center_changed', function() {
+        let viewCenter = vm.map.getCenter();
+        if (!vm.viewBounds.contains(viewCenter)) {
+          vm.map.setCenter(vm.lastValidMapCenter);
+        } else {
+          vm.lastValidMapCenter = viewCenter;
+        }
+      });
     }
     
     
     // Attaches the click listeners to the map
     function attachMapClickHandlers() {
-      $log.info('GameController limitViewableArea');
+      $log.info('GameController attachMapClickHandlers');
       
     }
     
+    /////////////////////////////////////
+    // MAP DRAWING METHODS
+    /////////////////////////////////////
+    
+    // RETURNS A SPEC OBJECT FOR EDGES
+    function edgeStyle(latlng1, latlng2, taxi, bus, underground, river) {
+      $log.info(`edgeStyle called, taxi: ${taxi}, bus: ${bus}, underground: ${underground}`);
+      let number = 0;
+      if (taxi)         number++;
+      if (bus)          number++;
+      if (underground)  number++;
+      $log.log(`${number} land routes being drawn.`);
+      let repeat = 24 / number;
+      let offset = 0;
+      function returnDashedLineSpec(color, offset) {
+        return {
+          offset: offset + '',
+          repeat: repeat + 'px',
+          icon: {
+            strokeOpacity:    1,
+            scale:            2, 
+            path:             'M 0,-1 0,1',
+            strokeLinecap:    'butt',
+            strokeColor:      color
+          }
+        };
+      }
+      let iconsArray = [];
+      if (taxi) {
+        iconsArray.push(returnDashedLineSpec(vm.colors.taxi, offset));
+        offset += repeat;
+      }
+      if (bus) {
+        iconsArray.push(returnDashedLineSpec(vm.colors.bus, offset));
+        offset += repeat;
+      }
+      if (underground) {
+        iconsArray.push(returnDashedLineSpec(vm.colors.underground, offset));
+        offset += repeat;
+      }
+      if (river) {
+        iconsArray.push(returnDashedLineSpec(vm.colors.river, offset));
+        offset += repeat;
+      }
+      return {
+        path:           [latlng1, latlng2],
+        strokeOpacity:  0,
+        map:            vm.map,
+        icons:          iconsArray
+      };
+    }
     
     
+    // defines the color styling for a node marker svg
+    // TODO: respec this so that it can put in other values for redrawing as appropriate for highlighting
+    function nodeStyle(node) {
+      return {
+        height:       20,
+        width:        20, 
+        strokeWidth:  2,
+        topColor:     vm.colors.taxi,
+        boxFill:      vm.colors.fill, 
+        textStroke:   vm.colors.outline,     
+        botColor:     (node.bus.length) ? vm.colors.bus : vm.colors.taxi,
+        outlineColor: (node.underground.length) ? vm.colors.underground : vm.colors.outline,
+        boxStroke:    (node.underground.length) ? vm.colors.underground : vm.colors.outline
+      };
+    }
     
     
     

@@ -1,15 +1,17 @@
-module.exports = function returnNodeSvgMapMarker(text, node) {
-  let mapMarkerSpec = {
-    height: 20,
-    width: 20, 
-    outlineColor: (node.underground.length) ? '#D62700' : '#002A4A',
-    strokeWidth: 2,
-    topColor: '#E3D6B7',
-    botColor: (node.bus.length) ? '#17607D' : '#E3D6B7',
-    boxStroke: (node.underground.length) ? '#D62700' : '#002A4A',
-    boxFill: '#FFFFFF', 
-    textStroke: '#002A4A'     
-  };
+module.exports = function returnNodeSvgMapMarker(text, node, nodeStyle) {
+  // let mapMarkerSpec = {
+  //   height: 20,
+  //   width: 20, 
+  //   outlineColor: (node.underground.length) ? '#D62700' : '#002A4A',
+  //   strokeWidth: 2,
+  //   topColor: '#E3D6B7',
+  //   botColor: (node.bus.length) ? '#17607D' : '#E3D6B7',
+  //   boxStroke: (node.underground.length) ? '#D62700' : '#002A4A',
+  //   boxFill: '#FFFFFF', 
+  //   textStroke: '#002A4A'     
+  // };
+  
+  let mapMarkerSpec = nodeStyle(node);
   
   return ('data:image/svg+xml;utf-8,' +
     encodeURIComponent(

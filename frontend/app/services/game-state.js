@@ -9,6 +9,7 @@
     gameState.user                = null;
     gameState.board               = angular.fromJson($window.localStorage.getItem('syGameBoard')) ? angular.fromJson($window.localStorage.getItem('syGameBoard')) : null;
     gameState.nodeList            = (gameState.board) ? Object.keys(gameState.board) : null;
+    gameState.edgeTypes           = ['taxi', 'bus', 'underground', 'river'];
     
     // game management
     gameState.gameId              = $routeParams.gameId;
@@ -61,7 +62,7 @@
       // TODO: figure out what data needs to be included here
       let newGameObj = { gameCreateorIsMrX, otherPlayer };
       
-      makeApiRequest('POST', 'games/', (err, response) => {
+      makeApiRequest('POST', 'games', (err, response) => {
         if (err) {
           $log.error(err);
           cb && cb(err);
@@ -93,13 +94,17 @@
         }
       });
       let loadGame = new Promise((resolve, reject) => {
-        gameState.loadGame(gameState.gameId, (err, response) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(response);
-          }
-        });
+        if (gameState.game) {
+          resolve(gameState.game);
+        } else {
+          gameState.loadGame(gameState.gameId, (err, response) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(response);
+            }
+          });
+        }
       });
       return Promise.all([loadBoard, loadGame]);
     }
