@@ -22,9 +22,10 @@
         requestParams.headers = headers;
       }
       // AUTOMATICALLY ADDS authToken if it's available
-      if ($window.sessionStorage.getItem('authToken')){
+      let authToken = angular.fromJson($window.sessionStorage.getItem('authToken'));
+      if (authToken) {
         requestParams.headers = {
-          token: $window.sessionStorage.getItem('authToken')
+          authorization: `Token ${authToken}`
         };
       }
       $log.log('requestParams are ', requestParams);
@@ -33,8 +34,8 @@
       $http(requestParams).then((response) => {
         $log.debug('SUCCESS IN makeApiRequest');
         $log.log(response);
-        $log.log(response.headers('authToken'));
         if (response.headers('authToken') && (path === 'users/')) {
+          $log.info('authToken received in server response headers');
           response.data.authToken = response.headers('authToken');
         }
         

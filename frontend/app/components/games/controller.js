@@ -30,9 +30,26 @@
     // REROUTE TO LOGIN IF NEEDED, OTHERWISE SET GAMES 
     function initialize() {
       $log.info('GamesController initialize');
-      // rerouteIfNeeded();
-      vm.games    = gameState.user.profile.games;
-      vm.friends  = gameState.user.profile.friends;
+      rerouteIfNeeded();
+      if (!gameState.user) {
+        $log.warn('HAD TO GRAB USER INFO FROM SESSION STORAGE.');
+        gameState.user = angular.fromJson($window.sessionStorage.getItem('user'));
+        vm.games    = gameState.user.profile.games;
+        vm.friends  = gameState.user.profile.friends; 
+      }  else {
+        $log.warn('ELSE BLOCK');
+        $log.log(gameState.user, typeof gameState.user);
+        
+        vm.games    = gameState.user.profile.games;
+        vm.friends  = gameState.user.profile.friends; 
+      }
+      // $log.log('GamesController initialize gameState.user is: ');
+      // $log.log(gameState.user);
+      // if (gameState.user) {
+      //   $log.warn(' TRUTHY gameState.user');
+      // }
+      // vm.games    = gameState.user.profile.games;
+      // vm.friends  = gameState.user.profile.friends;  
     }
     
     function toggleCreateGameVisible() {

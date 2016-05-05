@@ -1,3 +1,19 @@
 .error-message {
   color: red;
 }
+
+
+.map_holder {
+  position: relative;
+  height: 100vh;
+  width: 100vw;
+}
+
+.map_canvas {
+  position: absolute;
+  bottom: 0;
+  left: 10%;
+  height: 80%;
+  width: 80%;
+  background-color: red;
+}

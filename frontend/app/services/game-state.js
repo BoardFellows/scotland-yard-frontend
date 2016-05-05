@@ -6,12 +6,12 @@
     const gameState               = {};
     
     // general required information
-    gameState.user                = {};
+    gameState.user                = null;
     gameState.board               = $window.localStorage.getItem('syGameBoard') ? angular.fromJson($window.localStorage.getItem('syGameBoard')) : null;
     
     // game management
     gameState.gameId              = $routeParams.gameId;
-    gameState.game                = {};
+    gameState.game                = null;
     
     // turn management
     gameState.turns               = [];
@@ -117,7 +117,7 @@
             $log.error('Could not load the game board');
             if (alreadyTried) {
               $window.sessionStorage.setItem('authToken', null);
-              // rerouteIfNeeded();
+              rerouteIfNeeded();
             } else {
               alreadyTried++;
               tryLoadingBoard();
