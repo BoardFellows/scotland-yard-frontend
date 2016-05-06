@@ -103,6 +103,7 @@
     // THIS WILL BRING IN THE INFORMATION ABOUT THE GAME
     function initialize() {
       $log.info('GameController initialize');
+      gameState.gameId = $routeParams.gameId;
       $log.log(gameState.board);
       rerouteIfNeeded(); 
       if (!gameState.game || !gameState.board) {
@@ -289,16 +290,21 @@
     
     
     // RUNS ONCE A PLAYER HAS SELECTED THEIR PAYMENT TYPE
-    function processPayment(mode) {
-      $log.info(`GameController processPayment ${mode}`);
-      
+    function processPayment(mode, nodeToMoveTo, playerThatIsMoving) {
+      $log.info(`GameController processPayment ${mode}, ${nodeToMoveTo}, ${playerThatIsMoving}`);
+      gameState.makeMove({ player: playerThatIsMoving, nodeId: nodeToMoveTo, tokenType: mode }, (err, response) => {
+        $log.info(`GameController processPayment ${mode} CALLBACK`, err, response);
+        if (!err) {
+          vm.drawPlayerAtNode(playerThatIsMoving, nodeToMoveTo);
+        }
+      });
     }
     
     
     // DRAWS THE PLAYER AT THE SPECIFIED NODE
     function drawPlayerAtNode(playerId, nodeId) {
-      $log.info('GameController drawPlayerAtNode');
-      
+      $log.info(`GameController drawPlayerAtNode, player: ${playerId}, nodeId: ${nodeId}`);
+      vm.playerMarkers[playerId].setPosition(vm.coords[nodeId].coords);
     }
     
     
@@ -328,7 +334,8 @@
       $log.info('GameController attachMapClickHandlers');
       marker.addListener('click', function() {
         // TODO: fix this method to figure out which player's turn it is, not always use det1
-        let originNodeName  = gameState.rounds[gameState.rounds.length - 1]['det1_loc'];
+        let currentPlayer   = gameState.getNextPlayerToMove();
+        let originNodeName  = gameState.rounds[gameState.rounds.length - 1][`${currentPlayer}_loc`];
         let originNode      = gameState.board[originNodeName];
         $log.info(clickedNodeName, originNodeName);
         $log.log(originNode);
@@ -350,7 +357,8 @@
             let buttonEl = angular.element(document.querySelector(`#paymentButton__${mode}`));
             if (buttonEl) {
               buttonEl.on('click', function() {
-                vm.processPayment(mode);
+                vm.processPayment(mode, clickedNodeName, currentPlayer);
+                vm.infoWindow.close();
               });
             }
           });
