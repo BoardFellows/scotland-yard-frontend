@@ -4,7 +4,9 @@ module.exports = function returnInfoWindowHtml(originNodeName, originNode, click
     // log('generateHtml');
     let text = (`<div><h5>PAY BY:</h5>`);
     paymentTypes.forEach((mode) => {
-      text += (`<button onclick=${processPayment(mode)}>${mode.toUpperCase()}</button>`);
+      log(mode + ' is having button attached.');
+      text += (`<button id="paymentButton__${mode}">${mode.toUpperCase()}</button>`);
+      // text += (`<button onclick="${log}('${mode}')">${mode.toUpperCase()}</button>`);
     });
     text += '</div>';
     return text;

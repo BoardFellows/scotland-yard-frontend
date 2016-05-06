@@ -346,6 +346,10 @@
           let content       = vm.infoWindowContent(originNodeName, originNode, clickedNodeName, gameState.board[clickedNodeName], vm.processPayment, $log.log);
           vm.infoWindow.setContent(content);
           vm.infoWindow.open(vm.map, marker);
+          $log.warn(angular.element(document.querySelector('#paymentButton__taxi')));
+          angular.element(document.querySelector('#paymentButton__taxi')).on('click', function() {
+            vm.processPayment('taxi');
+          });
         }
       });
     }
