@@ -27,7 +27,7 @@
     vm.map                            = null;
     vm.mapHolder                      = angular.element(document.querySelector('#map_canvas'))[0];
     vm.viewBounds                     = new google.maps.LatLngBounds(
-      new google.maps.LatLng(51.48066238846036,  -0.19279329744723128),
+      new google.maps.LatLng(51.48066238846036, -0.19279329744723128),
       new google.maps.LatLng(51.54394811922664, -0.07118730513003158)
     ); 
     vm.lastValidMapCenter             = vm.viewBounds.getCenter();

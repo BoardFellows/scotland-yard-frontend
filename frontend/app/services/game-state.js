@@ -62,7 +62,7 @@
       // TODO: figure out what data needs to be included here
       let newGameObj = { gameCreateorIsMrX, otherPlayer };
       
-      makeApiRequest('POST', 'games', (err, response) => {
+      makeApiRequest('POST', 'games/', (err, response) => {
         if (err) {
           $log.error(err);
           cb && cb(err);
@@ -181,8 +181,8 @@
     }
     
     /////////////////////////////////////
-    // BUILD THE BOARD FOR THE CURRENT TURN
-    function buildBoardThisTurn() {
+    // BUILD THE BOARD FOR THE CURRENT TURN BASED ON A SERVER RESPONSE
+    function buildBoardThisTurn(response) {
       $log.info('gameState buildBoardThisTurn');
       
     }
@@ -251,7 +251,6 @@
             }
           }
         });
-        
       })();
       
     }

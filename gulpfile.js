@@ -52,3 +52,51 @@ gulp.task('build:all', ['eslint', 'build:clear', 'build:html', 'build:css', 'bui
 gulp.task('build:watch', () => {
   gulp.watch(PATHS.all, ['build:all']);
 });
+
+
+
+
+////////////////////////////////////////////////
+// BUILD TESTS
+////////////////////////////////////////////////
+gulp.task('test:clear', () => {
+  return del([__dirname + '/frontend/test/bundles/*']);
+});
+gulp.task('test:build-unit', () => {
+  return gulp.src(__dirname + '/frontend/test/unit/*_spec.js')
+  .pipe(webpack({ 
+    output: { filename: 'unit_bundle.js' }, 
+    module: { 
+      loaders: [
+        {
+          test: /\.js$/, 
+          loaders: ['babel'],
+          include: __dirname + '/app'
+        }
+      ]
+    } 
+  }))
+  .pipe(gulp.dest(__dirname + '/frontend/test/bundles'));
+});
+gulp.task('test:build-e2e', () => {
+  return gulp.src(__dirname + '/frontend/test/unit/*_spec.js')
+    .pipe(webpack({ 
+      output: { filename: 'e2e_bundle.js' }, 
+      module: { 
+        loaders: [
+          {
+            test: /\.js$/, 
+            loaders: ['babel'],
+            include: __dirname + '/app'
+          }
+        ]
+      } 
+    }))
+    .pipe(gulp.dest(__dirname + '/frontend/test/bundles'));
+});
+gulp.task('test:build', ['test:clear', 'test:build-e2e', 'test:build-e2e'], () => {
+  console.log('-------REBUILT TESTS-------');
+});
+gulp.task('test:watch', () => {
+  gulp.watch([__dirname + '/test/unit/*_spec.js', __dirname + '/test/e2e/*_spec.js'], ['test:build']);
+});

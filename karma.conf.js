@@ -15,7 +15,7 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'frontend/test/bundles/unit_bundle.js'
+      'frontend/test/unit/test_spec.js'
     ],
 
 
