@@ -11,7 +11,6 @@
     /////////////////////////////////////
     // ATTACH CONTROLLER PORPERTIES
     /////////////////////////////////////
-    
     const vm                          = this;
     vm.gameId                         = $routeParams.gameId;
     vm.showBoard                      = false;
@@ -22,6 +21,7 @@
     vm.coords                         = require(__dirname + '/board/coords.js');
     vm.nodeSvg                        = require(__dirname + '/board/node-svg.js');
     vm.playerSvg                      = require(__dirname + '/board/player-svg.js');
+    vm.infoWindowContent              = require(__dirname + '/board/info-window.js');
     
     // MAP RELATED 
     vm.map                            = null;
@@ -35,7 +35,7 @@
     // OBJECTS DRAWN ONTO MAP, NODES STORED ON vm.coords
     vm.playerMarkers                  = {};
     vm.edgePolylines                  = {};
-    vm.infoWindow                     = null;
+    vm.infoWindow                     = new google.maps.InfoWindow();
     
     /////////////////////////////////////
     // ATTACH CONTROLLER METHODS
@@ -66,16 +66,25 @@
     // DRAWING METHODS AND STYLES
     vm.markerStyles                   = {};
     vm.colors                         = {
-      taxi:         '#E3D6B7',
-      underground:  '#D62700',
-      bus:          '#17607D',
-      river:        '#000000',
-      outline:      '#002A4A',
+      river:        '#15171C',
+      taxi:         '#1A2944',
+      underground:  '#E11627',
+      bus:          '#77CFDE',
+      outline:      '#191C26',
       fill:         '#FFFFFF'
     };
     vm.markerStyles.nodeStyle         = nodeStyle;
     vm.markerStyles.edgeStyle         = edgeStyle;
-    // vm.markerStyles.playerStyle       = playerStyle;
+    vm.markerStyles.playerStyle       = {
+      det1:   { color: '#EB6528' },
+      det2:   { color: '#FC9D1C' },
+      det3:   { color: '#FFD97B' },
+      det4:   { color: '#9E332E' }, 
+      det5:   { color: '#AF2511' },
+      mrx:    { color: '#15171C' },
+      width:  24,
+      height: 24
+    };
     
     //////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////
@@ -167,8 +176,11 @@
             anchor: new google.maps.Point(20, 20)
           }
         });
+        // TODO: attach click event listeners here?
+        vm.attachMapClickHandlers(markerInfo.marker, node);
       });
     }
+    
     
     // DRAWS ALL PATHS ONTO THE MAP
     function initializeEdgesOntoMap() {
@@ -214,7 +226,26 @@
     // DRAWS ALL INITIAL PLAYER POSITIONS ONTO MAP 
     function initializePlayersOntoMap() {
       $log.info('GameController drawInitialPlayers');
-      
+      $log.log(gameState.game);
+      let rounds    = gameState.game.rounds;
+      let lastRound = rounds[rounds.length - 1];
+      Object.keys(lastRound).forEach((key) => {
+        let match = key.match(/(.+)_loc/i);
+        if (match && match.length) {
+          //TODO: implement if statement to only show mr.x if gameState.mrxVisible is true
+          let occupiedNodeName  = lastRound[key];
+          let coordinates       = vm.coords[occupiedNodeName].coords;
+          let marker            = new google.maps.Marker({
+            position: coordinates,
+            map: vm.map,
+            icon: {
+              url: vm.playerSvg(match[1], vm.markerStyles.playerStyle),
+              anchor: new google.maps.Point(20, 20)
+            }
+          });
+          vm.playerMarkers[match[1]] = marker;
+        }
+      });
     }
     
     
@@ -258,8 +289,8 @@
     
     
     // RUNS ONCE A PLAYER HAS SELECTED THEIR PAYMENT TYPE
-    function processPayment() {
-      $log.info('GameController processPayment');
+    function processPayment(mode) {
+      $log.info(`GameController processPayment ${mode}`);
       
     }
     
@@ -293,9 +324,30 @@
     
     
     // Attaches the click listeners to the map
-    function attachMapClickHandlers() {
+    function attachMapClickHandlers(marker, clickedNodeName) {
       $log.info('GameController attachMapClickHandlers');
-      
+      marker.addListener('click', function() {
+        // TODO: fix this method to figure out which player's turn it is, not always use det1
+        let originNodeName  = gameState.rounds[gameState.rounds.length - 1]['det1_loc'];
+        let originNode      = gameState.board[originNodeName];
+        $log.info(clickedNodeName, originNodeName);
+        $log.log(originNode);
+        // $log.log(originNode.taxi.indexOf(+clickedNodeName));
+        // $log.log(originNode.bus.indexOf(+clickedNodeName));
+        // $log.log(originNode.underground.indexOf(+clickedNodeName));
+        // $log.log(originNode.river.indexOf(+clickedNodeName));
+        let taxi            = (originNode.taxi.indexOf(+clickedNodeName) !== -1);
+        let bus             = (originNode.bus.indexOf(+clickedNodeName) !== -1);
+        let underground     = (originNode.underground.indexOf(+clickedNodeName) !== -1);
+        let river           = (originNode.river.indexOf(+clickedNodeName) !== -1);
+        let connectedFlag   = ( taxi || bus || underground || river );
+        // $log.warn(taxi, bus, underground, river, connectedFlag); 
+        if (connectedFlag) {
+          let content       = vm.infoWindowContent(originNodeName, originNode, clickedNodeName, gameState.board[clickedNodeName], vm.processPayment, $log.log);
+          vm.infoWindow.setContent(content);
+          vm.infoWindow.open(vm.map, marker);
+        }
+      });
     }
     
     /////////////////////////////////////
@@ -309,12 +361,13 @@
       if (taxi)         number++;
       if (bus)          number++;
       if (underground)  number++;
+      if (river)        number++;
       $log.log(`${number} land routes being drawn.`);
       let repeat = 24 / number;
       let offset = 0;
       function returnDashedLineSpec(color, offset) {
         return {
-          offset: offset + '',
+          offset: `${offset}`,
           repeat: repeat + 'px',
           icon: {
             strokeOpacity:    1,
@@ -355,15 +408,15 @@
     // TODO: respec this so that it can put in other values for redrawing as appropriate for highlighting
     function nodeStyle(node) {
       return {
-        height:       20,
-        width:        20, 
-        strokeWidth:  2,
-        topColor:     vm.colors.taxi,
-        boxFill:      vm.colors.fill, 
-        textStroke:   vm.colors.outline,     
-        botColor:     (node.bus.length) ? vm.colors.bus : vm.colors.taxi,
-        outlineColor: (node.underground.length) ? vm.colors.underground : vm.colors.outline,
-        boxStroke:    (node.underground.length) ? vm.colors.underground : vm.colors.outline
+        height:         20,
+        width:          20, 
+        strokeWidth:    2,
+        topColor:       vm.colors.taxi,
+        boxFill:        vm.colors.fill, 
+        textStroke:     vm.colors.outline,     
+        botColor:       (node.bus.length) ? vm.colors.bus : vm.colors.taxi,
+        outlineColor:   (node.underground.length) ? vm.colors.underground : vm.colors.outline,
+        boxStroke:      (node.underground.length) ? vm.colors.underground : vm.colors.outline
       };
     }
     

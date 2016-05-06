@@ -22,6 +22,7 @@
     
     // user/player management
     gameState.userType            = null;
+    gameState.mrxVisible          = false;
     gameState.usersTurn           = false;
     gameState.otherUser           = null;
     gameState.players             = [];
@@ -56,11 +57,11 @@
     
     /////////////////////////////////////
     // CREATE A NEW GAME
-    function createGame(gameCreateorIsMrX, otherPlayer, cb) {
+    function createGame(gameCreatorIsMrX, otherPlayer, cb) {
       $log.info('gameState createGame');
       
       // TODO: figure out what data needs to be included here
-      let newGameObj = { gameCreateorIsMrX, otherPlayer };
+      let newGameObj = { gameCreatorIsMrX, otherPlayer };
       
       makeApiRequest('POST', 'games/', (err, response) => {
         if (err) {
@@ -115,7 +116,7 @@
     function buildInitGameState(gameData) {
       $log.info('gameState buildInitGameState');
       gameState.game   = gameData;
-      gameState.turns  = gameData.turns;
+      gameState.rounds = gameData.rounds;
       
     }
     

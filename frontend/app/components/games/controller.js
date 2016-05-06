@@ -12,7 +12,7 @@
     vm.createGameButText        = 'New Game';
     vm.games                    = [];
     vm.friends                  = [];
-    vm.gameCreateorIsMrX        = true;
+    vm.gameCreatorIsMrX         = true;
     vm.otherPlayer              = null;
     vm.errorMessage             = null;
     
@@ -55,7 +55,7 @@
     function createNewGame() {
       $log.info('GamesController createNewGame');
       vm.errorMessage = null;
-      gameState.createGame(vm.gameCreateorIsMrX, vm.otherPlayer, (err, response) => {
+      gameState.createGame(vm.gameCreatorIsMrX, vm.otherPlayer, (err, response) => {
         $log.info('GamesController createNewGame callback');
         if (err) {
           vm.errorMessage = 'There was an error creating your game.';

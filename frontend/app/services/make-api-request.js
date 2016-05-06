@@ -10,7 +10,6 @@
       // BUILD THE REQUEST
       let requestParams = {
         method: method.toUpperCase(),
-        // url: `/requestProxy/${path}`
         url: `http://ec2-52-27-31-102.us-west-2.compute.amazonaws.com/${path}`   
       };
       if (data) { 
