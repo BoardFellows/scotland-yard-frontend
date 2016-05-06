@@ -12,7 +12,7 @@
     vm.createGameButText        = 'New Game';
     vm.games                    = [];
     vm.friends                  = [];
-    vm.gameCreateorIsMrX        = true;
+    vm.gameCreatorIsMrX         = true;
     vm.otherPlayer              = null;
     vm.errorMessage             = null;
     
@@ -30,9 +30,19 @@
     // REROUTE TO LOGIN IF NEEDED, OTHERWISE SET GAMES 
     function initialize() {
       $log.info('GamesController initialize');
-      // rerouteIfNeeded();
-      vm.games    = gameState.user.profile.games;
-      vm.friends  = gameState.user.profile.friends;
+      rerouteIfNeeded();
+      if (!gameState.user) {
+        $log.warn('GRABBED USER INFO FROM SESSION STORAGE.');
+        gameState.user  = angular.fromJson($window.sessionStorage.getItem('user'));
+        vm.games        = gameState.user.profile.games;
+        vm.friends      = gameState.user.profile.friends; 
+      }  else {
+        $log.warn('ELSE BLOCK');
+        $log.log(gameState.user, typeof gameState.user);
+        
+        vm.games        = gameState.user.profile.games;
+        vm.friends      = gameState.user.profile.friends; 
+      }
     }
     
     function toggleCreateGameVisible() {
@@ -45,7 +55,7 @@
     function createNewGame() {
       $log.info('GamesController createNewGame');
       vm.errorMessage = null;
-      gameState.createGame(vm.gameCreateorIsMrX, vm.otherPlayer, (err, response) => {
+      gameState.createGame(vm.gameCreatorIsMrX, vm.otherPlayer, (err, response) => {
         $log.info('GamesController createNewGame callback');
         if (err) {
           vm.errorMessage = 'There was an error creating your game.';
@@ -54,17 +64,40 @@
           $route.reload();
         }
       });
-      
     }
+
+
+
+
     
   }
   
   
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   // CONTROLLER FOR THE GAME SUMMARY DIRECTIVES
   function GameSummaryController($log, $scope) {
-    // const vm = this;
+    const vm                = this;
+    vm.otherPlayerUsername  = null;
+    
+    vm.initialize           = initialize;
     
     
+    //TODO: make it so that it will figure out what the other player's username is
+    function initialize() {
+      $log.log('GameSummaryController initialize');
+      // if ()
+    }
   }
   
 })();

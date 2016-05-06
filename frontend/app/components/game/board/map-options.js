@@ -61,7 +61,7 @@ module.exports = [
         lightness: '45'
       },
       {
-        gamma: '1.2'
+        gamma: '1.75'
       }
     ]
   },
@@ -91,7 +91,7 @@ module.exports = [
         'saturation': -100
       },
       {
-        'lightness': 45
+        'lightness': 50
       }
     ]
   },
@@ -211,7 +211,7 @@ module.exports = [
     elementType: 'all',
     stylers: [
       {
-        color: '#bbd9e5'
+        color: '#CAEAF7'
       },
       {
         visibility: 'simplified'

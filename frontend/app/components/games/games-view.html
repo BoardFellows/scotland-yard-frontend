@@ -10,7 +10,7 @@
   ></button>
   
   <div data-ng-hide="gamesCtrl.createGameFormHidden">
-    <form  novalidate class="container syNewGame">
+    <form  novalidate class="container syNewGame well">
       
       <fieldset class="form-group row">
         <label for="syNewGame__otherPlayer" class="col-sm-2">Invite by email:</label>
@@ -36,14 +36,14 @@
           
           <div class="radio">
             <label>
-              <input type="radio" name="gameCreateorIsMrX" value="true" checked data-ng-model="gamesCtrl.gameCreateorIsMrX">
+              <input type="radio" name="gameCreatorIsMrX" value="true" data-ng-model="gamesCtrl.gameCreatorIsMrX" />
               They're chasing me!
             </label>
           </div>
           
           <div class="radio">
             <label>
-              <input type="radio" name="gameCreateorIsMrX" value="false" data-ng-model="gamesCtrl.gameCreateorIsMrX">
+              <input type="radio" name="gameCreatorIsMrX" value="false" data-ng-model="gamesCtrl.gameCrateorIsMrX" />
               I'm chasing them!
             </label>
           </div>
@@ -56,7 +56,8 @@
     </form>
   </div>
   
-  <div data-ng-repeat="game in gamesCtrl.games | orderBy: 'lastUpdated'" data-ng-show="gamesCtrl.createGameFormHidden">
+  <!-- data-ng-show="gamesCtrl.createGameFormHidden" -->
+  <div data-ng-repeat="game in gamesCtrl.games | orderBy: 'lastUpdated'">
     <game-summary data-game="game" data-joinGameById="gamesCtrl.joinGameById(game.id)"></game-summary>
   </div>
   

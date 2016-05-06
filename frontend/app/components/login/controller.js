@@ -55,7 +55,7 @@
     /////////////////////////////////////
     // REROUTE THEM IF THEY'RE ALREADY LOGGED IN
     function initialize() {
-      if ($window.sessionStorage.getItem('authToken')) {
+      if (angular.fromJson($window.sessionStorage.getItem('authToken'))) {
         $location.url('/games');
         $route.reload();
       }  
@@ -78,10 +78,11 @@
         // MAKE THE REQUEST
         makeApiRequest('GET', 'users/', (err, response) => {
           if (err) {
-            throw new Error('There was a problem creating your account.');
+            throw new Error('There was a loggin you in.');
           } else {
             delete response.password;
-            $window.sessionStorage.setItem('authToken', response.authToken);
+            $window.sessionStorage.setItem('authToken', angular.toJson(response.authToken));
+            $window.sessionStorage.setItem('user', angular.toJson(response));
             gameState.user = response;
             $location.url('/games');
             $route.reload();
@@ -117,8 +118,9 @@
           } else {
             delete response.password;
             $log.log('loginCtrl callback', response);
-            $window.sessionStorage.setItem('authToken', response.authToken);
-            gameState.user = response; //TODO: figure out a better way to handle storing the user's data
+            $window.sessionStorage.setItem('authToken', angular.toJson(response.authToken));
+            $window.sessionStorage.setItem('user', angular.toJson(response));
+            gameState.user = response;
             $location.url('/games');
             $route.reload();
           }

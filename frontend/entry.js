@@ -17,10 +17,10 @@ require(__dirname + '/app/components/games/controller.js');
 require(__dirname + '/app/components/games/directive.js');
 
 require(__dirname + '/app/components/game/controller.js');
-require(__dirname + '/app/components/game/board/controller.js');
-require(__dirname + '/app/components/game/board/directive.js');
-require(__dirname + '/app/components/game/manager/controller.js');
-require(__dirname + '/app/components/game/manager/directive.js');
+// require(__dirname + '/app/components/game/manager/controller.js');
+// require(__dirname + '/app/components/game/board/controller.js');
+// require(__dirname + '/app/components/game/manager/directive.js');
+// require(__dirname + '/app/components/game/board/directive.js');
 
 require(__dirname + '/app/components/login/controller.js');
 
