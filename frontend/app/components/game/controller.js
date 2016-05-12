@@ -295,7 +295,8 @@
       gameState.makeMove({ player: playerThatIsMoving, nodeId: nodeToMoveTo, tokenType: mode }, (err, response) => {
         $log.info(`GameController processPayment ${mode} CALLBACK`, err, response);
         if (!err) {
-          vm.drawPlayerAtNode(playerThatIsMoving, nodeToMoveTo);
+          let nodeToMoveToFromResponse = response.rounds[response.rounds.length - 1][`${playerThatIsMoving}_loc`];
+          vm.drawPlayerAtNode(playerThatIsMoving, nodeToMoveToFromResponse);
         }
       });
     }
