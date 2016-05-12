@@ -25,8 +25,8 @@
     gameState.mrxVisible          = false;
     gameState.usersTurn           = false;
     gameState.otherUser           = null;
-    gameState.players             = [];
-    gameState.playerToMove        = null;
+    gameState.players             = ['mrx', 'det1', 'det2', 'det3', 'det4', 'det5'];
+    gameState.playerToMove        = 'mrx';
     
     // 1 time methods
     gameState.createGame          = createGame;
@@ -198,10 +198,19 @@
     
     /////////////////////////////////////
     // PUSH THE MOVE THE DATABASE
-    function makeMove() {
+    function makeMove(data , cb) {
       $log.info('gameState makeMove');
-      
-      
+      makeApiRequest('PUT', `games/${gameState.gameId}/`, (err, response) => {
+        if (err) {
+          $log.error('FAILURE TO PUT A NEW GAME MOVE.');
+          cb && cb(err);
+        } else {
+          $log.log(response);
+          // let lastRound = response.rounds[response.rounds.length - 1];
+          handleDbResponse(response);
+          cb && cb(null, response);
+        }
+      }, data);  
     }
     
     
@@ -214,9 +223,10 @@
     
     /////////////////////////////////////
     // HANDLES THE RESPONSE FROM THE DATABASE IN RESPONSE TO A MOVE
-    function handleDbResponse(respnse) {
+    function handleDbResponse(response) {
       $log.info('gameState handleDbResponse');
-      
+      gameState.rounds        = response.rounds;
+      gameState.playerToMove  = gameState.getNextPlayerToMove();
     }
     
     
@@ -224,7 +234,15 @@
     // FIGURE OUT WHICH PLAYER GETS TO MOVE NEXT
     function getNextPlayerToMove() {
       $log.info('gameState getNextPlayerToMove');
-      
+      let nextPlayer  = null;
+      let lastRound   = gameState.rounds[gameState.rounds.length -1];
+      for (var i = 0; i < gameState.players.length; i++) {
+        if (lastRound[gameState.players[i]] !== null) {
+          nextPlayer = gameState.players[i];
+          break;
+        }
+      }
+      return nextPlayer;  
     }
     
     
