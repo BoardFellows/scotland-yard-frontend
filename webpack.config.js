@@ -1,14 +1,14 @@
-const path = require('path');
+const webpack = require('webpack');
 
 let PATHS = {
-  entry:  path.join(__dirname, 'frontend/entry.js'),
-  output: path.join(__dirname, 'frontend/build')
+  entry:  __dirname + '/frontend/app/entry.js',
+  build:  __dirname + '/frontend/build'
 };
 
 module.exports = {
   entry: PATHS.entry,
   output: {
-    path: PATHS.output,
+    path:     PATHS.build,
     filename: 'bundle.js'
   }, 
   module: {
@@ -16,8 +16,24 @@ module.exports = {
       {
         test: /\.js$/, 
         loaders: ['babel'],
-        include: __dirname + '/app'
+        include: __dirname + '/frontend/app'
+      }, 
+      {
+        test: /\.css$/,
+        loaders: ['style', 'css']
       }
     ]
-  }
+  }, 
+  devServer: {
+    devtool:            'eval-source-map',
+    contentBase:        PATHS.build, 
+    historyApiFallback: true,
+    hot:                true,
+    inline:             true,
+    progress:           true,
+    stats:              'errors-only'
+  },
+  plugins: [
+    new webpack.HotModuleReplacementPlugin()
+  ]
 };
